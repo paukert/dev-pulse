@@ -1,0 +1,38 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    ports:
+      - "80:80"
+      - "5173:5173"
+    volumes:
+      - .:/var/www/html
+      - ./docker/log:/var/log/apache2
+    #      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+    depends_on:
+      - db
+    links:
+      - db:db
+    environment:
+      PHP_IDE_CONFIG: "serverName=localhost" # for debugging console commands in PHPStorm using Xdebug
+
+  db:
+    image: mariadb:11.4.5
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: dev_pulse
+
+  adminer:
+    image: adminer:latest
+    restart: always
+    ports:
+      - "8080:8080"
+
+volumes:
+  mariadb:
