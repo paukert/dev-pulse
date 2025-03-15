@@ -18,7 +18,7 @@ import UserMenuContent from '@/components/UserMenuContent.vue';
 import { getInitials } from '@/composables/useInitials';
 import type { BreadcrumbItem, NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-vue-next';
+import { BookOpen, ChartNoAxesCombined, Folders, Github, Menu, Swords, Users } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 interface Props {
@@ -42,19 +42,34 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: '/dashboard',
-        icon: LayoutGrid,
+        icon: ChartNoAxesCombined,
+    },
+    {
+        title: 'Users',
+        href: '#',
+        icon: Users,
+    },
+    {
+        title: 'Repositories',
+        href: '#',
+        icon: Folders,
+    },
+    {
+        title: 'Challenges',
+        href: '#',
+        icon: Swords,
     },
 ];
 
 const rightNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: Folder,
+        title: 'Source code',
+        href: 'https://github.com/paukert/dev-pulse',
+        icon: Github,
     },
     {
         title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits',
+        href: 'https://paukertlukas.cz/ctufit-thesis.pdf',
         icon: BookOpen,
     },
 ];
@@ -75,7 +90,7 @@ const rightNavItems: NavItem[] = [
                         <SheetContent side="left" class="w-[300px] p-6">
                             <SheetTitle class="sr-only">Navigation Menu</SheetTitle>
                             <SheetHeader class="flex justify-start text-left">
-                                <AppLogoIcon class="size-6 fill-current text-black dark:text-white" />
+                                <AppLogoIcon/>
                             </SheetHeader>
                             <div class="flex h-full flex-1 flex-col justify-between space-y-4 py-6">
                                 <nav class="-mx-3 space-y-1">
@@ -135,30 +150,24 @@ const rightNavItems: NavItem[] = [
                 </div>
 
                 <div class="ml-auto flex items-center space-x-2">
-                    <div class="relative flex items-center space-x-1">
-                        <Button variant="ghost" size="icon" class="group h-9 w-9 cursor-pointer">
-                            <Search class="size-5 opacity-80 group-hover:opacity-100" />
-                        </Button>
-
-                        <div class="hidden space-x-1 lg:flex">
-                            <template v-for="item in rightNavItems" :key="item.title">
-                                <TooltipProvider :delay-duration="0">
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <Button variant="ghost" size="icon" as-child class="group h-9 w-9 cursor-pointer">
-                                                <a :href="item.href" target="_blank" rel="noopener noreferrer">
-                                                    <span class="sr-only">{{ item.title }}</span>
-                                                    <component :is="item.icon" class="size-5 opacity-80 group-hover:opacity-100" />
-                                                </a>
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>{{ item.title }}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            </template>
-                        </div>
+                    <div class="hidden space-x-1 lg:flex">
+                        <template v-for="item in rightNavItems" :key="item.title">
+                            <TooltipProvider :delay-duration="0">
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button variant="ghost" size="icon" as-child class="group h-9 w-9 cursor-pointer">
+                                            <a :href="item.href" target="_blank" rel="noopener noreferrer">
+                                                <span class="sr-only">{{ item.title }}</span>
+                                                <component :is="item.icon" class="size-5 opacity-80 group-hover:opacity-100" />
+                                            </a>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{{ item.title }}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </template>
                     </div>
 
                     <DropdownMenu>
