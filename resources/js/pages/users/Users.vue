@@ -25,8 +25,8 @@ const props = defineProps<Props>();
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div class="container mx-auto py-10">
-                <DataTable :columns="columns" :data="props.users.data" />
+            <div class="container mx-auto py-10 space-y-4">
+                <DataTable :columns="columns" :paginated-data="props.users" />
             </div>
         </div>
     </AppLayout>

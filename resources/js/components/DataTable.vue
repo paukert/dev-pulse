@@ -1,5 +1,10 @@
 <script setup lang="ts" generic="TData, TValue">
 import type { ColumnDef } from '@tanstack/vue-table'
+import DataTablePaginator from '@/components/DataTablePaginator.vue';
+import { PaginatedResponse } from '@/types';
+import { ref } from 'vue';
+import { router } from '@inertiajs/vue3';
+
 import {
     Table,
     TableBody,
@@ -17,13 +22,37 @@ import {
 
 const props = defineProps<{
     columns: ColumnDef<TData, TValue>[]
-    data: TData[]
+    paginatedData: PaginatedResponse<TData>
 }>()
 
+const pagination = ref({
+    pageIndex: props.paginatedData.current_page - 1,
+    pageSize: props.paginatedData.per_page,
+})
+
 const table = useVueTable({
-    get data() { return props.data },
+    get data() { return props.paginatedData.data },
     get columns() { return props.columns },
     getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    pageCount: props.paginatedData.last_page,
+    onPaginationChange: updater => {
+        pagination.value = updater instanceof Function
+            ? updater(pagination.value)
+            : updater
+
+        router.get(
+            props.paginatedData.path,
+            {
+                page: pagination.value.pageIndex + 1,
+                per_page: pagination.value.pageSize,
+            },
+            { preserveState: false, preserveScroll: true }
+        );
+    },
+    state: {
+        get pagination() { return pagination.value },
+    },
 })
 </script>
 
@@ -61,4 +90,5 @@ const table = useVueTable({
             </TableBody>
         </Table>
     </div>
+    <DataTablePaginator :table="table" />
 </template>
