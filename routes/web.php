@@ -17,6 +17,9 @@ Route::get('dashboard', function () {
 Route::middleware(['auth', 'verified'])->group(static function (): void {
     Route::get('users', [UserController::class, 'index'])
         ->name('users.index');
+
+    Route::delete('users', [UserController::class, 'destroy'])
+        ->name('users.destroy');
 });
 
 require __DIR__.'/settings.php';

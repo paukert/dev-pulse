@@ -15,7 +15,7 @@ import {
     DialogTrigger
 } from '@/components/ui/dialog';
 
-defineProps<{
+const props = defineProps<{
     user: User
 }>()
 
@@ -51,9 +51,11 @@ defineProps<{
                             <Button variant="secondary">Cancel</Button>
                         </DialogClose>
 
-                        <Button variant="destructive">
-                            <button type="submit">Delete</button>
-                        </Button>
+                        <DialogClose>
+                            <Link :href="route('users.destroy', {id: props.user.id})" method="delete" as="button">
+                                <Button variant="destructive">Delete</Button>
+                            </Link>
+                        </DialogClose>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
