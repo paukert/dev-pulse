@@ -6,6 +6,8 @@ import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from './composables/useAppearance';
+import HighchartsVue from 'highcharts-vue';
+import 'highcharts/highcharts-more';
 
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
@@ -29,6 +31,7 @@ createInertiaApp({
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
+            .use(HighchartsVue)
             .mount(el);
     },
     progress: {
