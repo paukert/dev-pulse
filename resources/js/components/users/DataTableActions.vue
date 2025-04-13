@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal } from 'lucide-vue-next'
-import { Link } from '@inertiajs/vue3';
+import { MoreHorizontal, SquarePen, Trash2 } from 'lucide-vue-next'
+import { Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import { User } from '@/types';
 import {
     Dialog,
@@ -19,10 +20,20 @@ const props = defineProps<{
     user: User
 }>()
 
+const editUser = () => {
+    return;
+}
+
+const isDropdownOpen = ref(false)
+
+const closeDropdown = () => {
+    isDropdownOpen.value = false
+}
+
 </script>
 
 <template>
-    <DropdownMenu>
+    <DropdownMenu v-model:open="isDropdownOpen">
         <DropdownMenuTrigger as-child>
             <Button variant="ghost" class="w-8 h-8 p-0">
                 <span class="sr-only">Open menu</span>
@@ -31,11 +42,11 @@ const props = defineProps<{
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem><Link href="#">Edit</Link></DropdownMenuItem>
+            <DropdownMenuItem @select="editUser"><SquarePen /> Edit</DropdownMenuItem>
 
             <Dialog>
                 <DialogTrigger as-child>
-                    <DropdownMenuItem @select="(e) => e.preventDefault()">Delete</DropdownMenuItem>
+                    <DropdownMenuItem @select="(e) => e.preventDefault()"><Trash2 /> Delete</DropdownMenuItem>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader class="space-y-3">
@@ -51,7 +62,7 @@ const props = defineProps<{
                             <Button variant="secondary">Cancel</Button>
                         </DialogClose>
 
-                        <DialogClose>
+                        <DialogClose @click="closeDropdown">
                             <Link :href="route('users.destroy', {id: props.user.id})" method="delete" as="button">
                                 <Button variant="destructive">Delete</Button>
                             </Link>
