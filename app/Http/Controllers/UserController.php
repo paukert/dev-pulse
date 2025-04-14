@@ -18,7 +18,7 @@ class UserController extends Controller
         $perPage = $request->query->getInt('per_page', 20);
 
         return Inertia::render('users/Users', [
-            'users' => User::paginate($perPage)->through(static fn(User $user): array => [
+            'users' => User::paginate($perPage)->through(static fn (User $user): array => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
