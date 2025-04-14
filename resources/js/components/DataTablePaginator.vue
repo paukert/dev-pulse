@@ -1,33 +1,22 @@
 <script setup lang="ts" generic="TData">
-import { type Table } from '@tanstack/vue-table'
+import { type Table } from '@tanstack/vue-table';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-vue-next';
 
-import { Button } from '@/components/ui/button'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Props {
-    table: Table<TData>
+    table: Table<TData>;
 }
-defineProps<Props>()
+defineProps<Props>();
 </script>
 
 <template>
     <div class="flex items-center justify-end px-2">
         <div class="flex items-center space-x-6 lg:space-x-8">
             <div class="flex items-center space-x-2">
-                <p class="text-sm font-medium">
-                    Rows per page
-                </p>
-                <Select
-                    :model-value="`${table.getState().pagination.pageSize}`"
-                    @update:model-value="table.setPageSize"
-                >
+                <p class="text-sm font-medium">Rows per page</p>
+                <Select :model-value="`${table.getState().pagination.pageSize}`" @update:model-value="table.setPageSize">
                     <SelectTrigger class="h-8 w-[70px]">
                         <SelectValue :placeholder="`${table.getState().pagination.pageSize}`" />
                     </SelectTrigger>
@@ -43,36 +32,21 @@ defineProps<Props>()
                 {{ table.getPageCount() }}
             </div>
             <div class="flex items-center space-x-2">
-                <Button
-                    variant="outline"
-                    class="hidden w-8 h-8 p-0 lg:flex"
-                    :disabled="!table.getCanPreviousPage()"
-                    @click="table.setPageIndex(0)"
-                >
+                <Button variant="outline" class="hidden h-8 w-8 p-0 lg:flex" :disabled="!table.getCanPreviousPage()" @click="table.setPageIndex(0)">
                     <span class="sr-only">Go to first page</span>
                     <ChevronsLeft />
                 </Button>
-                <Button
-                    variant="outline"
-                    class="w-8 h-8 p-0"
-                    :disabled="!table.getCanPreviousPage()"
-                    @click="table.previousPage()"
-                >
+                <Button variant="outline" class="h-8 w-8 p-0" :disabled="!table.getCanPreviousPage()" @click="table.previousPage()">
                     <span class="sr-only">Go to previous page</span>
                     <ChevronLeft />
                 </Button>
-                <Button
-                    variant="outline"
-                    class="w-8 h-8 p-0"
-                    :disabled="!table.getCanNextPage()"
-                    @click="table.nextPage()"
-                >
+                <Button variant="outline" class="h-8 w-8 p-0" :disabled="!table.getCanNextPage()" @click="table.nextPage()">
                     <span class="sr-only">Go to next page</span>
                     <ChevronRight />
                 </Button>
                 <Button
                     variant="outline"
-                    class="hidden w-8 h-8 p-0 lg:flex"
+                    class="hidden h-8 w-8 p-0 lg:flex"
                     :disabled="!table.getCanNextPage()"
                     @click="table.setPageIndex(table.getPageCount() - 1)"
                 >

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { columns } from '@/components/users/columns';
 import DataTable from '@/components/DataTable.vue';
+import { columns } from '@/components/users/columns';
+import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem, PaginatedResponse, User } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import AppLayout from '@/layouts/AppLayout.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,7 +17,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
 </script>
 
 <template>
@@ -25,7 +24,7 @@ const props = defineProps<Props>();
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div class="container mx-auto py-10 space-y-4">
+            <div class="container mx-auto space-y-4 py-10">
                 <DataTable :columns="columns" :paginated-data="props.users" />
             </div>
         </div>

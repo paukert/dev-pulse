@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from 'vue';
 import { Activity } from 'lucide-vue-next';
+import type { HTMLAttributes } from 'vue';
 
 defineOptions({
     inheritAttrs: false,

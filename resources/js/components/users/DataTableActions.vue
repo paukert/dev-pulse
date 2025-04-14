@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, SquarePen, Trash2 } from 'lucide-vue-next'
-import { Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import { User } from '@/types';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -13,31 +8,35 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger
+    DialogTrigger,
 } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { User } from '@/types';
+import { Link, router } from '@inertiajs/vue3';
+import { MoreHorizontal, SquarePen, Trash2 } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 const props = defineProps<{
-    user: User
-}>()
+    user: User;
+}>();
 
 const editUser = () => {
     router.get(route('users.edit', { id: props.user.id }));
-}
+};
 
-const isDropdownOpen = ref(false)
+const isDropdownOpen = ref(false);
 
 const closeDropdown = () => {
-    isDropdownOpen.value = false
-}
-
+    isDropdownOpen.value = false;
+};
 </script>
 
 <template>
     <DropdownMenu v-model:open="isDropdownOpen">
         <DropdownMenuTrigger as-child>
-            <Button variant="ghost" class="w-8 h-8 p-0">
+            <Button variant="ghost" class="h-8 w-8 p-0">
                 <span class="sr-only">Open menu</span>
-                <MoreHorizontal class="w-4 h-4" />
+                <MoreHorizontal class="h-4 w-4" />
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -63,14 +62,13 @@ const closeDropdown = () => {
                         </DialogClose>
 
                         <DialogClose @click="closeDropdown">
-                            <Link :href="route('users.destroy', {id: props.user.id})" method="delete" as="button">
+                            <Link :href="route('users.destroy', { id: props.user.id })" method="delete" as="button">
                                 <Button variant="destructive">Delete</Button>
                             </Link>
                         </DialogClose>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-
         </DropdownMenuContent>
     </DropdownMenu>
 </template>
