@@ -21,7 +21,7 @@ const props = defineProps<{
 }>()
 
 const editUser = () => {
-    return;
+    router.get(route('users.edit', { id: props.user.id }));
 }
 
 const isDropdownOpen = ref(false)

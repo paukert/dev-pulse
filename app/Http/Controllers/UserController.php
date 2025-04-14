@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Users\UserUpdateRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,6 +24,31 @@ class UserController extends Controller
                 'email' => $user->email,
             ]),
         ]);
+    }
+
+    public function edit(int $id): Response
+    {
+        /** @var User $user */
+        $user = User::findOrFail($id);
+
+        return Inertia::render('users/Edit', [
+            'user' => $user->only(['id', 'name', 'email']),
+        ]);
+    }
+
+    public function update(UserUpdateRequest $request, int $id): RedirectResponse
+    {
+        /** @var User $user */
+        $user = User::findOrFail($id);
+        $user->fill($request->validated());
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        return to_route('users.edit', ['id' => $id]);
     }
 
     public function destroy(Request $request): RedirectResponse

@@ -18,6 +18,12 @@ Route::middleware(['auth', 'verified'])->group(static function (): void {
     Route::get('users', [UserController::class, 'index'])
         ->name('users.index');
 
+    Route::get('users/{id}/edit', [UserController::class, 'edit'])
+        ->name('users.edit');
+
+    Route::patch('users/{id}', [UserController::class, 'update'])
+        ->name('users.update');
+
     Route::delete('users', [UserController::class, 'destroy'])
         ->name('users.destroy');
 });
