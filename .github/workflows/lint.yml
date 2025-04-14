@@ -30,6 +30,9 @@ jobs:
       - name: Run Pint
         run: vendor/bin/pint --test
 
+      - name: Run Larastan
+        run: vendor/bin/phpstan analyse --memory-limit 256M
+
       - name: Format Frontend
         run: npm run format:check
 
