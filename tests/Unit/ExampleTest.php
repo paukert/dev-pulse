@@ -9,7 +9,7 @@ class ExampleTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_that_true_is_true()
+    public function test_that_true_is_true(): void
     {
         /** @phpstan-ignore method.alreadyNarrowedType */
         $this->assertTrue(true);

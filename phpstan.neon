@@ -9,4 +9,4 @@ parameters:
         - node_modules/*
         - storage/*
         - vendor/*
-    level: 5
+    level: 6
