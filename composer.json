@@ -39,6 +39,7 @@
     },
     "scripts": {
         "qa": [
+            "vendor/bin/phpunit",
             "vendor/bin/pint --test",
             "vendor/bin/phpstan analyse --memory-limit 256M"
         ],
