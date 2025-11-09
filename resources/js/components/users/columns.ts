@@ -26,6 +26,13 @@ export const columns: ColumnDef<User>[] = [
         },
     },
     {
+        accessorKey: 'role',
+        header: () => h('div', { class: 'text-left' }, 'Role'),
+        cell: ({ row }) => {
+            return h('div', { class: 'text-left font-medium' }, row.getValue('role'));
+        },
+    },
+    {
         id: 'actions',
         enableHiding: false,
         cell: ({ row }) => {

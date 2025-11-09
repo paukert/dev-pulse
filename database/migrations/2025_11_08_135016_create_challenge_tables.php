@@ -20,16 +20,11 @@ return new class () extends Migration {
             $table->timestamp('active_to');
         });
 
-        Schema::create('challenge_activity_types', static function (Blueprint $table): void {
-            $table->id();
-            $table->string('name');
-        });
-
         Schema::create('challenge_activities', static function (Blueprint $table): void {
             $table->id();
             $table->unsignedInteger('needed_actions_count');
+            $table->string('activity_type');
             $table->foreignId('challenge_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('challenge_activity_type_id')->constrained()->cascadeOnDelete();
         });
 
         Schema::create('badges', static function (Blueprint $table): void {
@@ -47,7 +42,6 @@ return new class () extends Migration {
     {
         Schema::dropIfExists('badges');
         Schema::dropIfExists('challenge_activities');
-        Schema::dropIfExists('challenge_activity_types');
         Schema::dropIfExists('challenges');
     }
 };

@@ -12,38 +12,44 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('platforms', static function (Blueprint $table): void {
-            $table->id();
-            $table->string('name');
-        });
-
         Schema::create('vcs_instances', static function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->string('api_url');
-            $table->foreignId('platform_id')->constrained()->cascadeOnDelete();
+            $table->text('token')->nullable();
+            $table->enum('platform', ['github', 'gitlab']);
+        });
+
+        Schema::create('vcs_instance_users', static function (Blueprint $table): void {
+            $table->id();
+            $table->string('vcs_id');
+            $table->string('username');
+            $table->foreignId('vcs_instance_id')->constrained('vcs_instances')->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
         });
 
         Schema::create('repositories', static function (Blueprint $table): void {
             $table->id();
+            $table->string('vcs_id');
             $table->string('name');
-            $table->string('access_token');
             $table->timestamp('statistics_from');
+            $table->timestamp('last_synced_at')->nullable();
             $table->foreignId('vcs_instance_id')->constrained()->cascadeOnDelete();
         });
 
         Schema::create('pull_requests', static function (Blueprint $table): void {
             $table->id();
+            $table->string('vcs_id');
             $table->string('title');
-            $table->string('state');
+            $table->enum('state', ['open', 'closed', 'merged']);
             $table->timestamp('created_at');
             $table->timestamp('updated_at')->nullable();
             $table->timestamp('merged_at')->nullable();
             $table->timestamp('closed_at')->nullable();
             $table->foreignId('repository_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('author_id')->constrained('users', 'id');
-            $table->foreignId('merged_by_user_id')->nullable()->constrained('users', 'id');
-            $table->foreignId('closed_by_user_id')->nullable()->constrained('users', 'id');
+            $table->foreignId('author_id')->constrained('vcs_instance_users', 'id');
+            $table->foreignId('merged_by_user_id')->nullable()->constrained('vcs_instance_users', 'id');
+            $table->foreignId('closed_by_user_id')->nullable()->constrained('vcs_instance_users', 'id');
         });
 
         Schema::create('pull_request_metrics', static function (Blueprint $table): void {
@@ -70,12 +76,14 @@ return new class () extends Migration {
 
         Schema::create('threads', static function (Blueprint $table): void {
             $table->id();
+            $table->string('vcs_id');
             $table->timestamp('resolved_at')->nullable();
-            $table->foreignId('resolved_by_user_id')->nullable()->constrained('users', 'id')->cascadeOnDelete();
+            $table->foreignId('resolved_by_user_id')->nullable()->constrained('vcs_instance_users', 'id')->cascadeOnDelete();
         });
 
         Schema::create('comments', static function (Blueprint $table): void {
             $table->id();
+            $table->string('vcs_id');
             $table->text('text');
             $table->timestamp('created_at');
             $table->timestamp('updated_at')->nullable();
@@ -97,7 +105,7 @@ return new class () extends Migration {
         Schema::dropIfExists('pull_request_metrics');
         Schema::dropIfExists('pull_requests');
         Schema::dropIfExists('repositories');
+        Schema::dropIfExists('vcs_instance_users');
         Schema::dropIfExists('vcs_instances');
-        Schema::dropIfExists('platforms');
     }
 };

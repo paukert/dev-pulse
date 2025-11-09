@@ -33,6 +33,8 @@ services:
     restart: always
     ports:
       - "8080:8080"
+    environment:
+      ADMINER_PLUGINS: dark-switcher tables-filter
 
 volumes:
   mariadb:

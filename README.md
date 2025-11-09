@@ -2,7 +2,7 @@
 
 Text diplomové práce je v samostatném repozitáři: https://github.com/paukert/fit-ctu-masters-thesis/
 
-## Lokální instalace
+## Spuštění na lokálním prostředí
 1. stáhnout a nainstalovat Docker - https://www.docker.com/get-started/ (Docker Desktop - https://www.docker.com/products/docker-desktop/)
 2. naklonovat [DevPulse repozitář](https://github.com/paukert/dev-pulse)
 3. vytvořit `.env` soubor a do něj překopírovat obsah souboru `.env.example`
@@ -12,7 +12,12 @@ Text diplomové práce je v samostatném repozitáři: https://github.com/pauker
 7. sestavit Single page aplikaci `docker-compose exec php npm run build`
 8. vygenerovat bezpečnostní klíč pro aplikaci `docker-compose exec php php artisan key:generate`
 9. spustit databázové migrace `docker-compose exec php php artisan migrate`
+10. testovací data lze nagenerovat pomocí `docker-compose exec php php artisan db:seed`
 
 Po provedení výše uvedených kroků bude systém dostupný na adrese http://localhost/.
 
 Všechny kontejnery lze naopak zastavit pomocí `docker-compose down`.
+
+V rámci běhu databázových migrací bude vytvořen uživatel s administrátorskou rolí:
+- e-mail: `admin@devpulse.com`
+- heslo: `password`
