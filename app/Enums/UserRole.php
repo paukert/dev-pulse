@@ -17,6 +17,9 @@ enum UserRole: string
         };
     }
 
+    /**
+     * @return array<string, string>
+     */
     public static function getLabels(): array
     {
         $roles = [];
