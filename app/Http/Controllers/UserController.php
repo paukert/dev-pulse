@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Http\Requests\Users\UserUpdateRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -33,7 +34,8 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         return Inertia::render('users/Edit', [
-            'user' => $user->only(['id', 'name', 'email']),
+            'user' => $user->only(['id', 'name', 'role', 'email']),
+            'roles' => UserRole::getLabels(),
         ]);
     }
 
@@ -41,7 +43,10 @@ class UserController extends Controller
     {
         /** @var User $user */
         $user = User::findOrFail($id);
-        $user->fill($request->validated());
+
+        $validated = $request->safe();
+        $user->fill($validated->except(['role']));
+        $user->role = $validated['role'] ?? $user->role;
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;

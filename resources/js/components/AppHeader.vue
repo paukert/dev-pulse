@@ -48,18 +48,20 @@ const mainNavItems: NavItem[] = [
         title: 'Users',
         href: '/users',
         icon: Users,
+        isVisible: auth.value.user.isAdmin,
     },
     {
         title: 'Repositories',
         href: '#',
         icon: Folders,
+        isVisible: auth.value.user.isAdmin,
     },
     {
         title: 'Challenges',
         href: '#',
         icon: Swords,
     },
-];
+].filter((item) => item.isVisible !== false);
 
 const rightNavItems: NavItem[] = [
     {

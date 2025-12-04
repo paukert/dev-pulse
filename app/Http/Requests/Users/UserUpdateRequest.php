@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Users;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ class UserUpdateRequest extends FormRequest
     {
         $rules = [
             'name' => ['required', 'string', 'max:255'],
+            'role' => [Rule::enum(UserRole::class)],
             'email' => [
                 'required',
                 'string',
