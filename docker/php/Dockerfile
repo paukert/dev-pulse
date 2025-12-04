@@ -1,6 +1,6 @@
 # docker build -t php-dev-pulse -f docker/php/Dockerfile .
 
-FROM php:8.4.5-apache
+FROM php:8.4.15-apache
 
 RUN apt-get update \
     && apt-get install -y zlib1g-dev build-essential gnupg ca-certificates libzip-dev libicu-dev g++ git zip curl libgd-dev libpng-dev libjpeg-dev libfreetype6-dev libpq-dev \
@@ -29,7 +29,7 @@ RUN pecl install xdebug \
     && echo 'xdebug.idekey=xdebug' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # Composer
-COPY --from=composer:2.8.6 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.9.2 /usr/bin/composer /usr/bin/composer
 
 # Node
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh \

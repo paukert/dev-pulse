@@ -18,7 +18,7 @@ services:
       PHP_IDE_CONFIG: "serverName=localhost" # for debugging console commands in PHPStorm using Xdebug
 
   db:
-    image: mariadb:11.4.5
+    image: mariadb:11.4.9
     restart: always
     ports:
       - "3306:3306"
