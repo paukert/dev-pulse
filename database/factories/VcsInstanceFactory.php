@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use LogicException;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\VcsInstance>
+ * @extends Factory<VcsInstance>
  */
 class VcsInstanceFactory extends Factory
 {

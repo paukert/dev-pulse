@@ -18,7 +18,7 @@ import UserMenuContent from '@/components/UserMenuContent.vue';
 import { getInitials } from '@/composables/useInitials';
 import type { BreadcrumbItem, NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, ChartNoAxesCombined, Folders, Github, Menu, Swords, Users } from 'lucide-vue-next';
+import { BookOpen, ChartNoAxesCombined, FolderGit2, Github, Menu, Swords, Users } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 interface Props {
@@ -53,7 +53,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Repositories',
         href: '#',
-        icon: Folders,
+        icon: FolderGit2,
         isVisible: auth.value.user.isAdmin,
     },
     {

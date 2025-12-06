@@ -32,6 +32,7 @@ return new class () extends Migration {
             $table->id();
             $table->string('vcs_id');
             $table->string('name');
+            $table->unsignedInteger('sync_interval');
             $table->timestamp('statistics_from');
             $table->timestamp('last_synced_at')->nullable();
             $table->foreignId('vcs_instance_id')->constrained()->cascadeOnDelete();
