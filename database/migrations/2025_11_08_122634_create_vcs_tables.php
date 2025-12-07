@@ -57,7 +57,7 @@ return new class () extends Migration {
             $table->unsignedInteger('added_lines');
             $table->unsignedInteger('deleted_lines');
             $table->unsignedInteger('files_count');
-            $table->foreignId('pull_request_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('pull_request_id')->primary()->constrained()->cascadeOnDelete();
         });
 
         Schema::create('approvers', static function (Blueprint $table): void {

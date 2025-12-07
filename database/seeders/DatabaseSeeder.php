@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\PullRequest;
 use App\Models\Repository;
 use App\Models\User;
 use App\Models\VcsInstance;
@@ -33,5 +34,9 @@ class DatabaseSeeder extends Seeder
                     ->create();
             });
         Repository::factory(20)->create();
+
+        PullRequest::factory(100)
+            ->hasMetrics()
+            ->create();
     }
 }
