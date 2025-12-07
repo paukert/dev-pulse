@@ -64,7 +64,7 @@ return new class () extends Migration {
             $table->id();
             $table->timestamp('approved_at');
             $table->foreignId('pull_request_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('vcs_instance_user_id')->constrained()->cascadeOnDelete();
         });
 
         Schema::create('reviewers', static function (Blueprint $table): void {
@@ -72,7 +72,7 @@ return new class () extends Migration {
             $table->timestamp('assigned_at');
             $table->timestamp('updated_at')->nullable();
             $table->foreignId('pull_request_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('vcs_instance_user_id')->constrained()->cascadeOnDelete();
         });
 
         Schema::create('threads', static function (Blueprint $table): void {
@@ -89,7 +89,7 @@ return new class () extends Migration {
             $table->timestamp('created_at');
             $table->timestamp('updated_at')->nullable();
             $table->foreignId('pull_request_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('vcs_instance_user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('thread_id')->nullable()->constrained()->cascadeOnDelete();
         });
     }
