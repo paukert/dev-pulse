@@ -21,7 +21,7 @@ class PullRequestFactory extends Factory
     {
         $createdAt = fake()->dateTimeBetween('-2 months', '-1 week');
         $state = fake()->randomElement(PullRequestState::cases());
-        $stateUpdatedAt = $createdAt->modify('+' . fake()->randomDigitNotZero() . ' days');
+        $stateUpdatedAt = (clone $createdAt)->modify('+' . fake()->randomDigitNotZero() . ' days');
         $authorId = VcsInstanceUser::inRandomOrder()->first()->id;
 
         return [

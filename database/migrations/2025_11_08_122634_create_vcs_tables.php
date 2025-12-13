@@ -70,7 +70,6 @@ return new class () extends Migration {
         Schema::create('reviewers', static function (Blueprint $table): void {
             $table->id();
             $table->timestamp('assigned_at');
-            $table->timestamp('updated_at')->nullable();
             $table->foreignId('pull_request_id')->constrained()->cascadeOnDelete();
             $table->foreignId('vcs_instance_user_id')->constrained()->cascadeOnDelete();
         });

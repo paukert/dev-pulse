@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Approver;
 use App\Models\PullRequest;
 use App\Models\Repository;
+use App\Models\Reviewer;
 use App\Models\User;
 use App\Models\VcsInstance;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\VcsInstanceUser;
 use Illuminate\Database\Seeder;
 
@@ -35,8 +36,40 @@ class DatabaseSeeder extends Seeder
             });
         Repository::factory(20)->create();
 
-        PullRequest::factory(100)
+        $pullRequests = PullRequest::factory(100)
             ->hasMetrics()
             ->create();
+
+        /** @var PullRequest $pullRequest */
+        foreach ($pullRequests as $pullRequest) {
+            $reviewers = VcsInstanceUser::inRandomOrder()
+                ->where('vcs_instance_id', '=', $pullRequest->repository->vcs_instance_id)
+                ->limit(rand(0, 2))
+                ->get();
+
+            /** @var VcsInstanceUser $reviewer */
+            foreach ($reviewers as $reviewer) {
+                $attrs = [
+                    'assigned_at' => fake()->dateTimeBetween($pullRequest->created_at, $pullRequest->updated_at ?? now()),
+                    'pull_request_id' => $pullRequest->id,
+                    'vcs_instance_user_id' => $reviewer->id,
+                ];
+
+                Reviewer::factory(1, $attrs)->create();
+            }
+
+            $approvers = $pullRequest->reviewers->filter(static fn (): bool => fake()->boolean(75));
+
+            /** @var Reviewer $approver */
+            foreach ($approvers as $approver) {
+                $attrs = [
+                    'approved_at' => fake()->dateTimeBetween($approver->assigned_at, $pullRequest->updated_at ?? now()),
+                    'pull_request_id' => $pullRequest->id,
+                    'vcs_instance_user_id' => $approver->vcs_instance_user_id,
+                ];
+
+                Approver::factory(1, $attrs)->create();
+            }
+        }
     }
 }

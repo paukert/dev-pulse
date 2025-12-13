@@ -6,9 +6,11 @@ namespace App\Models;
 
 use App\Enums\PullRequestState;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
@@ -35,6 +37,7 @@ use Illuminate\Support\Carbon;
  * @property ?VcsInstanceUser $mergedByUser
  * @property ?VcsInstanceUser $closedByUser
  * @property PullRequestMetrics $metrics
+ * @property Collection<int, Reviewer> $reviewers
  */
 class PullRequest extends Model
 {
@@ -92,5 +95,13 @@ class PullRequest extends Model
     public function metrics(): HasOne
     {
         return $this->hasOne(PullRequestMetrics::class);
+    }
+
+    /**
+     * @return HasMany<Reviewer, $this>
+     */
+    public function reviewers(): HasMany
+    {
+        return $this->hasMany(Reviewer::class);
     }
 }
