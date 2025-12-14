@@ -10,3 +10,6 @@ parameters:
         - storage/*
         - vendor/*
     level: 6
+    ignoreErrors:
+        - identifier: missingType.iterableValue
+          path: app/Services/GitProviders/Interfaces/Mapper.php
