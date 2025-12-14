@@ -86,7 +86,6 @@ return new class () extends Migration {
             $table->string('vcs_id');
             $table->text('text');
             $table->timestamp('created_at');
-            $table->timestamp('updated_at')->nullable();
             $table->foreignId('pull_request_id')->constrained()->cascadeOnDelete();
             $table->foreignId('vcs_instance_user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('thread_id')->nullable()->constrained()->cascadeOnDelete();
