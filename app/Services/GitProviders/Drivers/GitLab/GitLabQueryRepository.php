@@ -22,4 +22,30 @@ final readonly class GitLabQueryRepository implements QueryRepository
             }
         GQL;
     }
+
+    public function getUpdatedPullRequestsQuery(): string
+    {
+        return <<<'GQL'
+            query ($repositoryID: ID!, $updatedAfter: Time, $updatedBefore: Time, $afterCursor: String) {
+                projects(ids: [$repositoryID]) {
+                    nodes {
+                        mergeRequests(
+                            updatedAfter: $updatedAfter
+                            updatedBefore: $updatedBefore
+                            first: 100
+                            after: $afterCursor
+                        ) {
+                            pageInfo {
+                                endCursor
+                                hasNextPage
+                            }
+                            nodes {
+                                id
+                            }
+                        }
+                    }
+                }
+            }
+        GQL;
+    }
 }

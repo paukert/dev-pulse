@@ -7,4 +7,6 @@ namespace App\Services\GitProviders\Interfaces;
 interface QueryRepository
 {
     public function getRepositoriesQuery(): string;
+
+    public function getUpdatedPullRequestsQuery(): string;
 }
