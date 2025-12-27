@@ -9,4 +9,6 @@ interface QueryRepository
     public function getRepositoriesQuery(): string;
 
     public function getUpdatedPullRequestsQuery(): string;
+
+    public function getPullRequestQuery(): string;
 }

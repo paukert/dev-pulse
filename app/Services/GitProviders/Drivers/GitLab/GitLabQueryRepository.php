@@ -48,4 +48,80 @@ final readonly class GitLabQueryRepository implements QueryRepository
             }
         GQL;
     }
+
+    public function getPullRequestQuery(): string
+    {
+        return <<<'GQL'
+            query (
+                $pullRequestID: MergeRequestID!
+                $maxApproversCount: Int!
+                $maxReviewersCount: Int!
+                $maxCommentsCount: Int!
+            ) {
+                mergeRequest(id: $pullRequestID) {
+                    id
+                    name
+                    createdAt
+                    author {
+                        id
+                        username
+                    }
+                    updatedAt
+                    mergedAt
+                    mergeUser {
+                        id
+                        username
+                    }
+                    closedAt
+                    approvedBy(first: $maxApproversCount) {
+                        pageInfo {
+                            hasNextPage
+                        }
+                        nodes {
+                            id
+                            username
+                        }
+                    }
+                    reviewers(first: $maxReviewersCount) {
+                        pageInfo {
+                            hasNextPage
+                        }
+                        nodes {
+                            id
+                            username
+                        }
+                    }
+                    notes(last: $maxCommentsCount) {
+                        pageInfo {
+                            startCursor
+                            hasPreviousPage
+                        }
+                        nodes {
+                            author {
+                                id
+                                username
+                            }
+                            body
+                            createdAt
+                            discussion {
+                                id
+                                resolvedAt
+                                resolvable
+                                resolvedBy {
+                                    id
+                                    username
+                                }
+                            }
+                            system
+                        }
+                    }
+                    diffStatsSummary {
+                        additions
+                        deletions
+                        fileCount
+                    }
+                }
+            }
+        GQL;
+    }
 }

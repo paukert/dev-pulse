@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\PullRequestState;
-use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,7 +19,7 @@ use Illuminate\Support\Carbon;
  * @property string $vcs_id
  * @property string $title
  * @property PullRequestState $state
- * @property CarbonImmutable $created_at
+ * @property Carbon $created_at
  * @property ?Carbon $updated_at
  * @property ?Carbon $merged_at
  * @property ?Carbon $closed_at
@@ -37,6 +36,7 @@ use Illuminate\Support\Carbon;
  * @property ?VcsInstanceUser $mergedByUser
  * @property ?VcsInstanceUser $closedByUser
  * @property PullRequestMetrics $metrics
+ * @property Collection<int, Approver> $approvers
  * @property Collection<int, Reviewer> $reviewers
  */
 class PullRequest extends Model
@@ -44,13 +44,17 @@ class PullRequest extends Model
     /** @use HasFactory<\Database\Factories\PullRequestFactory> */
     use HasFactory;
 
+    public const int MAX_SUPPORTED_APPROVERS_COUNT = 100;
+    public const int MAX_SUPPORTED_REVIEWERS_COUNT = 100;
+    public const int MAX_COMMENTS_COUNT_PER_BATCH = 100;
+
     public $timestamps = false;
 
     protected function casts(): array
     {
         return [
             'state' => PullRequestState::class,
-            'created_at' => 'immutable_datetime',
+            'created_at' => 'datetime',
             'updated_at' => 'datetime',
             'merged_at' => 'datetime',
             'closed_at' => 'datetime',
@@ -95,6 +99,14 @@ class PullRequest extends Model
     public function metrics(): HasOne
     {
         return $this->hasOne(PullRequestMetrics::class);
+    }
+
+    /**
+     * @return HasMany<Approver, $this>
+     */
+    public function approvers(): HasMany
+    {
+        return $this->hasMany(Approver::class);
     }
 
     /**
