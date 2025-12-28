@@ -1,12 +1,12 @@
 # docker build -t php-dev-pulse -f docker/php/Dockerfile .
 
-FROM php:8.4.15-apache
+FROM php:8.5.1-apache
 
 RUN apt-get update \
     && apt-get install -y zlib1g-dev build-essential gnupg ca-certificates libzip-dev libicu-dev g++ git zip curl libgd-dev libpng-dev libjpeg-dev libfreetype6-dev libpq-dev \
     && docker-php-ext-configure gd --with-external-gd --with-freetype --with-jpeg \
     && docker-php-ext-configure pcntl --enable-pcntl \
-    && docker-php-ext-install pdo pdo_mysql mysqli pgsql pdo_pgsql intl zip gd bcmath sockets iconv opcache exif pcntl \
+    && docker-php-ext-install pdo pdo_mysql mysqli pgsql pdo_pgsql intl zip gd bcmath sockets exif pcntl \
     && pecl install apcu \
     && docker-php-ext-enable apcu \
     && echo ' \
