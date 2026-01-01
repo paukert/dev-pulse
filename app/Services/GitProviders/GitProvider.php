@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\GitProviders;
 
+use App\DTOs\PullRequest\PullRequestDTO;
 use App\DTOs\PullRequest\PullRequestsListDTO;
 use App\DTOs\RepositoriesListDTO;
+use App\Models\PullRequest;
 use App\Models\Repository;
 use App\Models\VcsInstance;
 use App\Services\GitProviders\Interfaces\Authenticator;
@@ -13,7 +15,9 @@ use App\Services\GitProviders\Interfaces\Mapper;
 use App\Services\GitProviders\Interfaces\QueryRepository;
 use DateTimeInterface;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Throwable;
 
 final readonly class GitProvider
 {
@@ -92,6 +96,58 @@ final readonly class GitProvider
 
     private function syncPullRequests(Repository $repository, PullRequestsListDTO $pullRequests): void
     {
-        //
+        DB::beginTransaction();
+
+        try {
+            foreach ($pullRequests->items as $pullRequest) {
+                $response = $this->getAuthenticatedRequest()->post(
+                    $this->vcsInstance->api_url,
+                    [
+                        'query' => $this->queryRepository->getPullRequestQuery(),
+                        'variables' => [
+                            'pullRequestID' => $pullRequest['vcsId'],
+                            'maxApproversCount' => PullRequest::MAX_SUPPORTED_APPROVERS_COUNT,
+                            'maxReviewersCount' => PullRequest::MAX_SUPPORTED_REVIEWERS_COUNT,
+                            'maxActivitiesCount' => PullRequest::MAX_ACTIVITIES_COUNT_PER_BATCH,
+                        ],
+                    ]
+                );
+
+                $pullRequestDTO = $this->mapper->mapPullRequest($response->json());
+                $pullRequestDTO = $this->loadMissingActivities($pullRequestDTO);
+
+                //PullRequest::updateOrCreateFromDTO($pullRequestDTO, $repository);
+                sleep(1);
+            }
+
+            DB::commit();
+        } catch (Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    private function loadMissingActivities(PullRequestDTO $pullRequest): PullRequestDTO
+    {
+        while ($pullRequest->activities->pageInfo?->hasNextPage === true) {
+            $response = $this->getAuthenticatedRequest()->post(
+                $this->vcsInstance->api_url,
+                [
+                    'query' => $this->queryRepository->getActivitiesQuery(),
+                    'variables' => [
+                        'pullRequestID' => $pullRequest->vcsId,
+                        'afterCursor' => $pullRequest->activities->pageInfo->endCursor,
+                        'maxActivitiesCount' => PullRequest::MAX_ACTIVITIES_COUNT_PER_BATCH,
+                    ],
+                ]
+            );
+
+            $activities = $this->mapper->mapAndMergeAdditionalPullRequestActivities($response->json(), $pullRequest->activities);
+            $pullRequest = $pullRequest->with(activities: $activities);
+
+            sleep(1);
+        }
+
+        return $pullRequest;
     }
 }

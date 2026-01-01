@@ -4,20 +4,40 @@ declare(strict_types=1);
 
 namespace App\Services\GitProviders\Drivers\GitLab;
 
+use App\DTOs\CommentDTO;
 use App\DTOs\PageInfoDTO;
+use App\DTOs\PullRequest\PullRequestActivitiesListDTO;
 use App\DTOs\PullRequest\PullRequestActivityDTO;
 use App\DTOs\PullRequest\PullRequestDTO;
-use App\DTOs\PullRequest\PullRequestsListDTO;
 use App\DTOs\PullRequest\PullRequestMetricsDTO;
+use App\DTOs\PullRequest\PullRequestsListDTO;
 use App\DTOs\RepositoriesListDTO;
+use App\DTOs\ThreadDTO;
 use App\DTOs\UserDTO;
 use App\Enums\PullRequestState;
 use App\Services\GitProviders\Interfaces\Mapper;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use Log;
-use LogicException;
 
+/**
+ * @phpstan-type Notes array{
+ *     pageInfo: array{endCursor: string, hasNextPage: bool},
+ *     nodes: array<array{
+ *         id: string,
+ *         author: array{id: string, username: string},
+ *         body: string,
+ *         createdAt: string,
+ *         discussion: array{
+ *             id: string,
+ *             resolvedAt: ?string,
+ *             resolvable: bool,
+ *             resolvedBy: ?array{id: string, username: string},
+ *         },
+ *         system: bool,
+ *     }>,
+ * }
+ */
 final readonly class GitLabMapper implements Mapper
 {
     /**
@@ -100,21 +120,7 @@ final readonly class GitLabMapper implements Mapper
      *                 pageInfo: array{hasNextPage: bool},
      *                 nodes: array<array{id: string, username: string}>
      *             },
-     *             notes: array{
-     *                 pageInfo: array{startCursor: string, hasPreviousPage: bool},
-     *                 nodes: array<array{
-     *                     author: array{id: string, username: string},
-     *                     body: string,
-     *                     createdAt: string,
-     *                     discussion: array{
-     *                         id: string,
-     *                         resolvedAt: ?string,
-     *                         resolvable: bool,
-     *                         resolvedBy: ?array{id: string, username: string},
-     *                     },
-     *                     system: bool,
-     *                 }>,
-     *             },
+     *             notes: Notes,
      *             diffStatsSummary: array{additions: int, deletions: int, fileCount: int},
      *         },
      *     },
@@ -130,18 +136,10 @@ final readonly class GitLabMapper implements Mapper
             default => PullRequestState::OPEN,
         };
 
-        $systemNotes = array_filter($data['notes']['nodes'], static fn (array $note): bool => $note['system']);
-        $comments = array_filter($data['notes']['nodes'], static fn (array $note): bool => !$note['system']);
-
         $approvals = [];
         foreach ($data['approvedBy']['nodes'] as $approver) {
             $userDTO = new UserDTO(username: $approver['username'], vcsId: $approver['id']);
-            $note = array_find(
-                $systemNotes,
-                static fn (array $note): bool => $note['author']['id'] === $userDTO->vcsId && $note['body'] === 'approved this merge request'
-            ) ?? throw new LogicException('Date of approval not found in system notes.');
-            $approvedAt = Carbon::createFromFormat(DateTimeInterface::ATOM, $note['createdAt']);
-            $approvals[] = new PullRequestActivityDTO(performedAt: $approvedAt, user: $userDTO);
+            $approvals[] = new PullRequestActivityDTO(performedAt: null, user: $userDTO);
         }
 
         if ($data['approvedBy']['pageInfo']['hasNextPage']) {
@@ -153,12 +151,7 @@ final readonly class GitLabMapper implements Mapper
         $reviews = [];
         foreach ($data['reviewers']['nodes'] as $reviewer) {
             $userDTO = new UserDTO(username: $reviewer['username'], vcsId: $reviewer['id']);
-            $note = array_find(
-                $systemNotes,
-                static fn (array $note): bool => str_contains($note['body'], "requested review from @$userDTO->username")
-            ) ?? throw new LogicException('Date of review request not found in system notes.');
-            $requestedAt = Carbon::createFromFormat(DateTimeInterface::ATOM, $note['createdAt']);
-            $reviews[] = new PullRequestActivityDTO(performedAt: $requestedAt, user: $userDTO);
+            $reviews[] = new PullRequestActivityDTO(performedAt: null, user: $userDTO);
         }
 
         if ($data['reviewers']['pageInfo']['hasNextPage']) {
@@ -166,6 +159,11 @@ final readonly class GitLabMapper implements Mapper
                 'id' => $data['id'],
             ]);
         }
+
+        $activities = $this->mapAndMergePullRequestActivities(
+            $data['notes'],
+            new PullRequestActivitiesListDTO(approvals: $approvals, reviews: $reviews, comments: [], threads: [])
+        );
 
         return new PullRequestDTO(
             vcsId: $data['id'],
@@ -186,8 +184,103 @@ final readonly class GitLabMapper implements Mapper
                 deletedLines: $data['diffStatsSummary']['deletions'],
                 filesCount: $data['diffStatsSummary']['fileCount'],
             ),
+            activities: $activities,
+        );
+    }
+
+    /**
+     * @param Notes $notes
+     */
+    private function mapAndMergePullRequestActivities(
+        array $notes,
+        PullRequestActivitiesListDTO $activities
+    ): PullRequestActivitiesListDTO {
+        $systemNotes = array_filter($notes['nodes'], static fn (array $note): bool => $note['system']);
+        $comments = array_filter($notes['nodes'], static fn (array $note): bool => !$note['system']);
+
+        $approvals = [];
+        foreach ($activities->approvals as $approval) {
+            if ($approval->performedAt !== null) {
+                $approvals[] = $approval;
+                continue;
+            }
+
+            $note = array_find(
+                $systemNotes,
+                static fn (array $note): bool => $note['author']['id'] === $approval->user->vcsId && $note['body'] === 'approved this merge request'
+            );
+            $approvedAt = $note === null ? null : Carbon::createFromFormat(DateTimeInterface::ATOM, $note['createdAt']);
+            $approvals[] = new PullRequestActivityDTO(performedAt: $approvedAt, user: $approval->user);
+        }
+
+        $reviews = [];
+        foreach ($activities->reviews as $review) {
+            if ($review->performedAt !== null) {
+                $reviews[] = $review;
+                continue;
+            }
+
+            $note = array_find(
+                $systemNotes,
+                static fn (array $note): bool => str_contains($note['body'], "requested review from @{$review->user->username}")
+            );
+            $requestedAt = $note === null ? null : Carbon::createFromFormat(DateTimeInterface::ATOM, $note['createdAt']);
+            $reviews[] = new PullRequestActivityDTO(performedAt: $requestedAt, user: $review->user);
+        }
+
+        $threads = $activities->threads;
+        $mappedComments = [];
+        foreach ($comments as $comment) {
+            $author = new UserDTO(username: $comment['author']['username'], vcsId: $comment['author']['id']);
+            $createdAt = Carbon::createFromFormat(DateTimeInterface::ATOM, $comment['createdAt']);
+            $discussion = $comment['discussion'];
+
+            if ($discussion['resolvable'] && !isset($threads[$discussion['id']])) {
+                $threads[$discussion['id']] = new ThreadDTO(
+                    vcsId: $discussion['id'],
+                    resolvedAt: $discussion['resolvedAt'] !== null
+                        ? Carbon::createFromFormat(DateTimeInterface::ATOM, $discussion['resolvedAt'])
+                        : null,
+                    resolvedBy: $discussion['resolvedAt'] !== null
+                        ? new UserDTO(username: $discussion['resolvedBy']['username'], vcsId: $discussion['resolvedBy']['id'])
+                        : null,
+                );
+            }
+
+            $mappedComments[] = new CommentDTO(
+                vcsId: $comment['id'],
+                text: $comment['body'],
+                author: $author,
+                createdAt: $createdAt,
+                threadVcsId: isset($threads[$discussion['id']]) ? $discussion['id'] : null,
+            );
+        }
+
+        return new PullRequestActivitiesListDTO(
             approvals: $approvals,
             reviews: $reviews,
+            comments: array_merge($activities->comments, $mappedComments),
+            threads: $threads,
+            pageInfo: new PageInfoDTO(
+                hasNextPage: $notes['pageInfo']['hasNextPage'],
+                endCursor: $notes['pageInfo']['endCursor'],
+            ),
         );
+    }
+
+    /**
+     * @param array{
+     *     data: array{
+     *         mergeRequest: array{
+     *             notes: Notes,
+     *         },
+     *     },
+     * } $data
+     */
+    public function mapAndMergeAdditionalPullRequestActivities(
+        array $data,
+        PullRequestActivitiesListDTO $activities
+    ): PullRequestActivitiesListDTO {
+        return $this->mapAndMergePullRequestActivities($data['data']['mergeRequest']['notes'], $activities);
     }
 }

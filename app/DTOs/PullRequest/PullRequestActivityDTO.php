@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 final readonly class PullRequestActivityDTO
 {
     public function __construct(
-        public Carbon $performedAt,
+        public ?Carbon $performedAt,
         public UserDTO $user
     ) {
         //

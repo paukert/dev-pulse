@@ -56,7 +56,7 @@ final readonly class GitLabQueryRepository implements QueryRepository
                 $pullRequestID: MergeRequestID!
                 $maxApproversCount: Int!
                 $maxReviewersCount: Int!
-                $maxCommentsCount: Int!
+                $maxActivitiesCount: Int!
             ) {
                 mergeRequest(id: $pullRequestID) {
                     id
@@ -91,12 +91,13 @@ final readonly class GitLabQueryRepository implements QueryRepository
                             username
                         }
                     }
-                    notes(last: $maxCommentsCount) {
+                    notes(first: $maxActivitiesCount) {
                         pageInfo {
-                            startCursor
-                            hasPreviousPage
+                            endCursor
+                            hasNextPage
                         }
                         nodes {
+                            id
                             author {
                                 id
                                 username
@@ -119,6 +120,45 @@ final readonly class GitLabQueryRepository implements QueryRepository
                         additions
                         deletions
                         fileCount
+                    }
+                }
+            }
+        GQL;
+    }
+
+    public function getActivitiesQuery(): string
+    {
+        return <<<'GQL'
+            query (
+                $pullRequestID: MergeRequestID!
+                $afterCursor: String!
+                $maxActivitiesCount: Int!
+            ) {
+                mergeRequest(id: $pullRequestID) {
+                    notes(first: $maxActivitiesCount, after: $afterCursor) {
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                        nodes {
+                            id
+                            author {
+                                id
+                                username
+                            }
+                            body
+                            createdAt
+                            discussion {
+                                id
+                                resolvedAt
+                                resolvable
+                                resolvedBy {
+                                    id
+                                    username
+                                }
+                            }
+                            system
+                        }
                     }
                 }
             }

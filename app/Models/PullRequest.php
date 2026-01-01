@@ -46,7 +46,7 @@ class PullRequest extends Model
 
     public const int MAX_SUPPORTED_APPROVERS_COUNT = 100;
     public const int MAX_SUPPORTED_REVIEWERS_COUNT = 100;
-    public const int MAX_COMMENTS_COUNT_PER_BATCH = 100;
+    public const int MAX_ACTIVITIES_COUNT_PER_BATCH = 100;
 
     public $timestamps = false;
 

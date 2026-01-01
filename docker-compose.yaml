@@ -16,6 +16,18 @@ services:
       - db:db
     environment:
       PHP_IDE_CONFIG: "serverName=localhost" # for debugging console commands in PHPStorm using Xdebug
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.laravel-cron.schedule: "@every 1m"
+      ofelia.job-exec.laravel-cron.command: "php artisan schedule:run"
+
+  ofelia:
+    image: mcuadros/ofelia:0.3.20
+    depends_on:
+      - php
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 
   db:
     image: mariadb:11.4.9

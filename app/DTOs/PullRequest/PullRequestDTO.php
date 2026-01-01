@@ -10,10 +10,6 @@ use Illuminate\Support\Carbon;
 
 final readonly class PullRequestDTO
 {
-    /**
-     * @param array<PullRequestActivityDTO> $approvals
-     * @param array<PullRequestActivityDTO> $reviews
-     */
     public function __construct(
         public string $vcsId,
         public string $title,
@@ -26,9 +22,13 @@ final readonly class PullRequestDTO
         public ?UserDTO $mergedByUser,
         public ?UserDTO $closedByUser,
         public PullRequestMetricsDTO $metrics,
-        public array $approvals,
-        public array $reviews,
+        public PullRequestActivitiesListDTO $activities,
     ) {
         //
+    }
+
+    public function with(PullRequestActivitiesListDTO $activities): self
+    {
+        return clone($this, ['activities' => $activities]);
     }
 }

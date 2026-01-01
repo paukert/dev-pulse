@@ -11,4 +11,6 @@ interface QueryRepository
     public function getUpdatedPullRequestsQuery(): string;
 
     public function getPullRequestQuery(): string;
+
+    public function getActivitiesQuery(): string;
 }
