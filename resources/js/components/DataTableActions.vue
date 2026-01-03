@@ -11,18 +11,16 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { User } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
 import { MoreHorizontal, SquarePen, Trash2 } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 const props = defineProps<{
-    user: User;
+    deleteConfirmationTitle: string;
+    deleteConfirmationMessage: string;
+    deleteUrl: string;
+    editUrl: string;
 }>();
-
-const editUser = () => {
-    router.get(route('users.edit', { id: props.user.id }));
-};
 
 const isDropdownOpen = ref(false);
 
@@ -41,7 +39,7 @@ const closeDropdown = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem @select="editUser"><SquarePen /> Edit</DropdownMenuItem>
+            <DropdownMenuItem @select="() => router.get(props.editUrl)"><SquarePen /> Edit</DropdownMenuItem>
 
             <Dialog>
                 <DialogTrigger as-child>
@@ -49,11 +47,8 @@ const closeDropdown = () => {
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader class="space-y-3">
-                        <DialogTitle>Do you really want to delete user {{ $props.user.name }}?</DialogTitle>
-                        <DialogDescription>
-                            This action cannot be undone. This will permanently delete user {{ $props.user.name }}
-                            and all of his data.
-                        </DialogDescription>
+                        <DialogTitle>{{ $props.deleteConfirmationTitle }}</DialogTitle>
+                        <DialogDescription>{{ $props.deleteConfirmationMessage }}</DialogDescription>
                     </DialogHeader>
 
                     <DialogFooter class="gap-2">
@@ -62,7 +57,7 @@ const closeDropdown = () => {
                         </DialogClose>
 
                         <DialogClose @click="closeDropdown">
-                            <Link :href="route('users.destroy', { id: props.user.id })" method="delete" as="button">
+                            <Link :href="props.deleteUrl" method="delete" as="button">
                                 <Button variant="destructive">Delete</Button>
                             </Link>
                         </DialogClose>

@@ -52,7 +52,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Repositories',
-        href: '#',
+        href: '/repositories',
         icon: FolderGit2,
         isVisible: auth.value.user.isAdmin,
     },

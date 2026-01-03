@@ -1,4 +1,4 @@
-import DataTableActions from '@/components/users/DataTableActions.vue';
+import DataTableActions from '@/components/DataTableActions.vue';
 import { User } from '@/types';
 import { ColumnDef } from '@tanstack/vue-table';
 import { h } from 'vue';
@@ -41,7 +41,10 @@ export const columns: ColumnDef<User>[] = [
                 'div',
                 { class: 'relative text-right' },
                 h(DataTableActions, {
-                    user,
+                    deleteConfirmationTitle: `Do you really want to delete user ${user.name}?`,
+                    deleteConfirmationMessage: `This action cannot be undone. This will permanently delete user ${user.name} and all of his data.`,
+                    deleteUrl: route('users.destroy', { id: user.id }),
+                    editUrl: route('users.edit', { id: user.id }),
                 }),
             );
         },

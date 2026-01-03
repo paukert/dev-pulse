@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\UserRole;
+use App\Http\Controllers\RepositoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -27,6 +28,9 @@ Route::middleware(['auth', 'verified', $hasAdminRoleMiddleware])->group(static f
 
     Route::delete('users', [UserController::class, 'destroy'])
         ->name('users.destroy');
+
+    Route::get('repositories', [RepositoryController::class, 'index'])
+        ->name('repositories.index');
 });
 
 require __DIR__.'/settings.php';

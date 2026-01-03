@@ -38,6 +38,14 @@ export interface User {
     role: string;
 }
 
+export interface Repository {
+    id: number;
+    name: string;
+    sync_interval: number;
+    statistics_from: string;
+    last_synced_at: string | null;
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;
 
 export interface PaginatedResponse<T> {
