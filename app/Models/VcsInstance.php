@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\VcsPlatform;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property string $api_url
  * @property ?string $token
+ * @property ?string $installation_id
  * @property VcsPlatform $platform
  *
  * Relationships
@@ -42,5 +44,21 @@ class VcsInstance extends Model
     public function repositories(): HasMany
     {
         return $this->hasMany(Repository::class);
+    }
+
+    /**
+     * @return Attribute<string, string>
+     */
+    protected function apiUrl(): Attribute
+    {
+        return Attribute::make(
+            get: static fn (string $value): string => rtrim($value, '/'),
+            set: static fn (string $value): string => rtrim($value, '/'),
+        );
+    }
+
+    public function getGraphQLApiUrl(): string
+    {
+        return $this->api_url . '/graphql';
     }
 }

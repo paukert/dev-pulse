@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'github' => [
+        'app_client_id' => env('GITHUB_APP_CLIENT_ID'),
+        'app_private_key' => env('GITHUB_APP_PRIVATE_KEY'),
+    ],
+
 ];

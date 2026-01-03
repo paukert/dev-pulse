@@ -17,6 +17,7 @@ return new class () extends Migration {
             $table->string('name');
             $table->string('api_url');
             $table->text('token')->nullable();
+            $table->string('installation_id')->nullable();
             $table->enum('platform', ['github', 'gitlab']);
         });
 

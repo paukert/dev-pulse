@@ -41,7 +41,7 @@ final readonly class GitProvider
     {
         $request = $this->getAuthenticatedRequest();
         $response = $request->post(
-            $this->vcsInstance->api_url,
+            $this->vcsInstance->getGraphQLApiUrl(),
             [
                 'query' => $this->queryRepository->getRepositoriesQuery(),
                 'variables' => ['filterValue' => $filterValue]
@@ -70,7 +70,7 @@ final readonly class GitProvider
 
         while (true) {
             $response = $this->getAuthenticatedRequest()->post(
-                $this->vcsInstance->api_url,
+                $this->vcsInstance->getGraphQLApiUrl(),
                 [
                     'query' => $this->queryRepository->getUpdatedPullRequestsQuery(),
                     'variables' => [
@@ -101,7 +101,7 @@ final readonly class GitProvider
         try {
             foreach ($pullRequests->items as $pullRequest) {
                 $response = $this->getAuthenticatedRequest()->post(
-                    $this->vcsInstance->api_url,
+                    $this->vcsInstance->getGraphQLApiUrl(),
                     [
                         'query' => $this->queryRepository->getPullRequestQuery(),
                         'variables' => [
@@ -131,7 +131,7 @@ final readonly class GitProvider
     {
         while ($pullRequest->activities->pageInfo?->hasNextPage === true) {
             $response = $this->getAuthenticatedRequest()->post(
-                $this->vcsInstance->api_url,
+                $this->vcsInstance->getGraphQLApiUrl(),
                 [
                     'query' => $this->queryRepository->getActivitiesQuery(),
                     'variables' => [

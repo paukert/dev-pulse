@@ -21,12 +21,13 @@ class VcsInstanceFactory extends Factory
         return match (fake()->randomElement(VcsPlatform::cases())) {
             VcsPlatform::GITHUB => [
                 'name' => 'GitHub - ' . fake()->domainWord(),
-                'api_url' => 'https://api.github.com/graphql',
+                'api_url' => 'https://api.github.com/',
+                'installation_id' => fake()->randomNumber(4),
                 'platform' => VcsPlatform::GITHUB,
             ],
             VcsPlatform::GITLAB => [
                 'name' => 'GitLab - ' . fake()->domainWord(),
-                'api_url' => 'https://gitlab.com/api/graphql',
+                'api_url' => 'https://gitlab.com/api/',
                 'token' => fake()->uuid(),
                 'platform' => VcsPlatform::GITLAB,
             ],
