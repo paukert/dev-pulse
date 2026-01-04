@@ -7,6 +7,7 @@ namespace App\Services\GitProviders;
 use App\DTOs\PullRequest\PullRequestDTO;
 use App\DTOs\PullRequest\PullRequestsListDTO;
 use App\DTOs\RepositoriesListDTO;
+use App\Enums\VcsPlatform;
 use App\Models\PullRequest;
 use App\Models\Repository;
 use App\Models\VcsInstance;
@@ -39,6 +40,11 @@ final readonly class GitProvider
 
     public function getAvailableRepositories(?string $filterValue = null): RepositoriesListDTO
     {
+        $filterValue = match ($this->vcsInstance->platform) {
+            VcsPlatform::GITHUB => "$filterValue in:name sort:name-asc",
+            default => $filterValue,
+        };
+
         $request = $this->getAuthenticatedRequest();
         $response = $request->post(
             $this->vcsInstance->getGraphQLApiUrl(),
@@ -82,7 +88,7 @@ final readonly class GitProvider
                 ]
             );
 
-            $pullRequestsPage = $this->mapper->mapPullRequestsPage($response->json());
+            $pullRequestsPage = $this->mapper->mapPullRequestsPage($response->json(), $syncFrom, $repository->syncStartedAt);
             $pullRequestsList = array_merge($pullRequestsList, $pullRequestsPage->items);
 
             $afterCursor = $pullRequestsPage->pageInfo->endCursor;

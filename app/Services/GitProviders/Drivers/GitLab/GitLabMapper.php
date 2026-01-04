@@ -16,6 +16,7 @@ use App\DTOs\ThreadDTO;
 use App\DTOs\UserDTO;
 use App\Enums\PullRequestState;
 use App\Services\GitProviders\Interfaces\Mapper;
+use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use Log;
@@ -80,7 +81,7 @@ final readonly class GitLabMapper implements Mapper
      *     },
      * } $data
      */
-    public function mapPullRequestsPage(array $data): PullRequestsListDTO
+    public function mapPullRequestsPage(array $data, CarbonInterface $from, CarbonInterface $to): PullRequestsListDTO
     {
         $pullRequestsData = $data['data']['projects']['nodes'][0]['mergeRequests'];
 
