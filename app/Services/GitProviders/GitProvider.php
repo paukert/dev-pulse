@@ -148,8 +148,7 @@ final readonly class GitProvider
                 ]
             );
 
-            $activities = $this->mapper->mapAndMergeAdditionalPullRequestActivities($response->json(), $pullRequest->activities);
-            $pullRequest = $pullRequest->with(activities: $activities);
+            $pullRequest = $this->mapper->mapAndMergeAdditionalPullRequestActivities($response->json(), $pullRequest);
 
             sleep(1);
         }

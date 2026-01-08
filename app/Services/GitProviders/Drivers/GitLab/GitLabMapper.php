@@ -280,8 +280,10 @@ final readonly class GitLabMapper implements Mapper
      */
     public function mapAndMergeAdditionalPullRequestActivities(
         array $data,
-        PullRequestActivitiesListDTO $activities
-    ): PullRequestActivitiesListDTO {
-        return $this->mapAndMergePullRequestActivities($data['data']['mergeRequest']['notes'], $activities);
+        PullRequestDTO $pullRequest
+    ): PullRequestDTO {
+        $activities = $this->mapAndMergePullRequestActivities($data['data']['mergeRequest']['notes'], $pullRequest->activities);
+
+        return $pullRequest->with(activities: $activities);
     }
 }

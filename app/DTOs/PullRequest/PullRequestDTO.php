@@ -27,8 +27,11 @@ final readonly class PullRequestDTO
         //
     }
 
-    public function with(PullRequestActivitiesListDTO $activities): self
+    public function with(?PullRequestActivitiesListDTO $activities = null, ?UserDTO $closedByUser = null): self
     {
-        return clone($this, ['activities' => $activities]);
+        return clone($this, [
+            'activities' => $activities ?? $this->activities,
+            'closedByUser' => $closedByUser ?? $this->closedByUser,
+        ]);
     }
 }
