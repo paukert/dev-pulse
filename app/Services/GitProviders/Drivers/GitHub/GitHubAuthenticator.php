@@ -26,6 +26,11 @@ final readonly class GitHubAuthenticator implements Authenticator
             name: 'Authorization',
             value: "Bearer $installationToken"
         );
+
+        $request->withHeader(
+            name: 'X-Github-Next-Global-ID',
+            value: 1
+        );
     }
 
     private function getInstallationToken(VcsInstance $vcsInstance): string

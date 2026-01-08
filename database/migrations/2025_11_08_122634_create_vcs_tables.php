@@ -27,6 +27,7 @@ return new class () extends Migration {
             $table->string('username');
             $table->foreignId('vcs_instance_id')->constrained('vcs_instances')->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->unique(['vcs_id', 'vcs_instance_id']);
         });
 
         Schema::create('repositories', static function (Blueprint $table): void {
@@ -66,6 +67,7 @@ return new class () extends Migration {
             $table->timestamp('approved_at');
             $table->foreignId('pull_request_id')->constrained()->cascadeOnDelete();
             $table->foreignId('vcs_instance_user_id')->constrained()->cascadeOnDelete();
+            $table->unique(['pull_request_id', 'vcs_instance_user_id']);
         });
 
         Schema::create('reviewers', static function (Blueprint $table): void {
@@ -73,6 +75,7 @@ return new class () extends Migration {
             $table->timestamp('assigned_at');
             $table->foreignId('pull_request_id')->constrained()->cascadeOnDelete();
             $table->foreignId('vcs_instance_user_id')->constrained()->cascadeOnDelete();
+            $table->unique(['pull_request_id', 'vcs_instance_user_id']);
         });
 
         Schema::create('threads', static function (Blueprint $table): void {
@@ -80,6 +83,8 @@ return new class () extends Migration {
             $table->string('vcs_id');
             $table->timestamp('resolved_at')->nullable();
             $table->foreignId('resolved_by_user_id')->nullable()->constrained('vcs_instance_users', 'id')->cascadeOnDelete();
+            $table->foreignId('pull_request_id')->constrained()->cascadeOnDelete();
+            $table->unique(['pull_request_id', 'vcs_id']);
         });
 
         Schema::create('comments', static function (Blueprint $table): void {
@@ -90,6 +95,7 @@ return new class () extends Migration {
             $table->foreignId('pull_request_id')->constrained()->cascadeOnDelete();
             $table->foreignId('vcs_instance_user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('thread_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->unique(['pull_request_id', 'vcs_id']);
         });
     }
 

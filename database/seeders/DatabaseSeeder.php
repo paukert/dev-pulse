@@ -79,6 +79,7 @@ class DatabaseSeeder extends Seeder
                 $resolved = fake()->boolean(75);
 
                 return [
+                    'pull_request_id' => $pullRequest->id,
                     'resolved_at' => $resolved
                         ? fake()->dateTimeBetween($pullRequest->created_at, $pullRequest->updated_at ?? now())
                         : null,

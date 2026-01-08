@@ -17,9 +17,11 @@ use Illuminate\Support\Carbon;
  *
  * Foreign keys
  * @property ?int $resolved_by_user_id
+ * @property int $pull_request_id
  *
  * Relationships
  * @property ?VcsInstanceUser $resolvedByUser
+ * @property PullRequest $pullRequest
  */
 class Thread extends Model
 {
@@ -33,6 +35,14 @@ class Thread extends Model
         return [
             'resolved_at' => 'datetime',
         ];
+    }
+
+    /**
+     * @return BelongsTo<PullRequest, $this>
+     */
+    public function pullRequest(): BelongsTo
+    {
+        return $this->belongsTo(PullRequest::class);
     }
 
     /**
