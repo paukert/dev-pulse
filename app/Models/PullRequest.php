@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\DTOs\PullRequest\PullRequestDTO;
 use App\Enums\PullRequestState;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -115,5 +116,40 @@ class PullRequest extends Model
     public function reviewers(): HasMany
     {
         return $this->hasMany(Reviewer::class);
+    }
+
+    public static function upsertFromDTO(PullRequestDTO $pullRequestDTO, Repository $repository): self
+    {
+        $pullRequest = PullRequest::where([
+            'vcs_id' => $pullRequestDTO->vcsId,
+            'repository_id' => $repository->id,
+        ])->firstOrNew();
+
+        $pullRequest->vcs_id = $pullRequestDTO->vcsId;
+        $pullRequest->title = $pullRequestDTO->title;
+        $pullRequest->state = $pullRequestDTO->state;
+        $pullRequest->created_at = $pullRequestDTO->createdAt;
+        $pullRequest->updated_at = $pullRequestDTO->updatedAt;
+        $pullRequest->merged_at = $pullRequestDTO->mergedAt;
+        $pullRequest->closed_at = $pullRequestDTO->closedAt;
+
+        $pullRequest->repository_id = $repository->id;
+        $pullRequest->author_id = VcsInstanceUser::upsertFromDTO($pullRequestDTO->author, $repository->vcsInstance);
+        $pullRequest->merged_by_user_id = $pullRequestDTO->mergedByUser !== null
+            ? VcsInstanceUser::upsertFromDTO($pullRequestDTO->mergedByUser, $repository->vcsInstance)
+            : null;
+        $pullRequest->closed_by_user_id = $pullRequestDTO->closedByUser !== null
+            ? VcsInstanceUser::upsertFromDTO($pullRequestDTO->closedByUser, $repository->vcsInstance)
+            : null;
+
+        $pullRequest->save();
+
+        PullRequestMetrics::upsertFromDTO($pullRequestDTO->metrics, $pullRequest);
+        Approver::upsertFromDTOs($pullRequestDTO->activities->approvals, $pullRequest);
+        Reviewer::upsertFromDTOs($pullRequestDTO->activities->reviews, $pullRequest);
+        Thread::upsertFromDTOs($pullRequestDTO->activities->threads, $pullRequest);
+        Comment::upsertFromDTOs($pullRequestDTO->activities->comments, $pullRequest);
+
+        return $pullRequest;
     }
 }

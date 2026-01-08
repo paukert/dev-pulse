@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\DTOs\PullRequest\PullRequestMetricsDTO;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,5 +34,19 @@ class PullRequestMetrics extends Model
     public function pullRequest(): BelongsTo
     {
         return $this->belongsTo(PullRequest::class);
+    }
+
+    public static function upsertFromDTO(PullRequestMetricsDTO $metricsDTO, PullRequest $pullRequest): void
+    {
+        PullRequestMetrics::upsert(
+            values: [
+                'pull_request_id' => $pullRequest->id,
+                'added_lines' => $metricsDTO->addedLines,
+                'deleted_lines' => $metricsDTO->deletedLines,
+                'files_count' => $metricsDTO->filesCount,
+            ],
+            uniqueBy: ['pull_request_id'],
+            update: ['added_lines', 'deleted_lines', 'files_count']
+        );
     }
 }

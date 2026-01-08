@@ -122,7 +122,7 @@ final readonly class GitProvider
                 $pullRequestDTO = $this->mapper->mapPullRequest($response->json());
                 $pullRequestDTO = $this->loadMissingActivities($pullRequestDTO);
 
-                //PullRequest::updateOrCreateFromDTO($pullRequestDTO, $repository);
+                PullRequest::upsertFromDTO($pullRequestDTO, $repository);
                 sleep(1);
             }
 
