@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Approver;
+use App\Models\Badge;
+use App\Models\Challenge;
+use App\Models\ChallengeActivity;
 use App\Models\Comment;
 use App\Models\PullRequest;
 use App\Models\Repository;
@@ -99,6 +102,21 @@ class DatabaseSeeder extends Seeder
 
                 Comment::factory(rand(1, 3), $attrs)->create();
             }
+        }
+
+        $challenges = Challenge::factory(10)->create()->each(static function (Challenge $challenge): void {
+            ChallengeActivity::factory(rand(1, 3), ['challenge_id' => $challenge->id])->create();
+        });
+
+        /** @var Challenge $challenge */
+        foreach ($challenges as $challenge) {
+            $attrsCallback = fn (): array => [
+                'earned_at' => fake()->dateTimeBetween($challenge->active_from, now()),
+                'challenge_id' => $challenge->id,
+                'user_id' => User::inRandomOrder()->first()->id,
+            ];
+
+            Badge::factory(rand(1, 3), $attrsCallback)->create();
         }
     }
 }
