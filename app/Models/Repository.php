@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 
 /**
  * Attributes
@@ -32,6 +33,10 @@ class Repository extends Model
 
     public $timestamps = false;
 
+    protected $fillable = [
+        'name',
+    ];
+
     public ?Carbon $syncStartedAt = null;
 
     protected function casts(): array
@@ -39,6 +44,21 @@ class Repository extends Model
         return [
             'statistics_from' => 'immutable_datetime',
             'last_synced_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * @return array<string, array<array-key, mixed>>
+     */
+    public static function rules(): array
+    {
+        return [
+            'vcs_id' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
+            'sync_interval' => ['required', 'integer'],
+            'sync_interval_hours' => ['required', 'integer', Rule::in([1, 4, 6, 12, 24])],
+            'statistics_from' => ['required', 'date'],
+            'vcs_instance_id' => [Rule::exists(VcsInstance::class, 'id')],
         ];
     }
 

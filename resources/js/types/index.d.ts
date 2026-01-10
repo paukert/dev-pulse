@@ -42,6 +42,7 @@ export interface Repository {
     id: number;
     name: string;
     sync_interval: number;
+    sync_interval_hours?: number;
     statistics_from: string;
     last_synced_at: string | null;
 }

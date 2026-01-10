@@ -30,10 +30,10 @@ export const columns: ColumnDef<Repository>[] = [
         },
     },
     {
-        accessorKey: 'sync_interval',
+        accessorKey: 'sync_interval_hours',
         header: () => h('div', { class: 'text-left' }, 'Sync interval'),
         cell: ({ row }) => {
-            return h('div', { class: 'text-left font-medium' }, row.getValue('sync_interval') + ' hour(s)');
+            return h('div', { class: 'text-left font-medium' }, row.getValue('sync_interval_hours') + ' hour(s)');
         },
     },
     {
@@ -54,8 +54,8 @@ export const columns: ColumnDef<Repository>[] = [
                 h(DataTableActions, {
                     deleteConfirmationTitle: `Do you really want to delete repository ${repository.name}?`,
                     deleteConfirmationMessage: `This action cannot be undone. This will permanently delete repository ${repository.name} and all associated data.`,
-                    deleteUrl: '#',
-                    editUrl: '#',
+                    deleteUrl: route('repositories.destroy', { repository: repository.id }),
+                    editUrl: route('repositories.edit', { repository: repository.id }),
                 }),
             );
         },

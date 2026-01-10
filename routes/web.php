@@ -29,8 +29,12 @@ Route::middleware(['auth', 'verified', $hasAdminRoleMiddleware])->group(static f
     Route::delete('users', [UserController::class, 'destroy'])
         ->name('users.destroy');
 
-    Route::get('repositories', [RepositoryController::class, 'index'])
-        ->name('repositories.index');
+    Route::resource('repositories', RepositoryController::class)->only([
+        'index',
+        'edit',
+        'update',
+        'destroy',
+    ]);
 });
 
 require __DIR__.'/settings.php';

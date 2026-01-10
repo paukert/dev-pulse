@@ -20,7 +20,7 @@ class RepositoryFactory extends Factory
         return [
             'vcs_id' => fake()->uuid(),
             'name' => fake()->domainWord(),
-            'sync_interval' => fake()->randomDigitNotZero() * 3600,
+            'sync_interval' => fake()->randomElement([1, 4, 6, 12, 24]) * 3600,
             'statistics_from' => fake()->dateTimeBetween('-3 months', 'now'),
             'vcs_instance_id' => VcsInstance::query()->inRandomOrder()->first()->id,
         ];
