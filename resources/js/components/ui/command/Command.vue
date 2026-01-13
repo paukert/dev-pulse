@@ -7,13 +7,14 @@ import { reactive, ref, watch } from "vue"
 import { cn } from "@/lib/utils"
 import { provideCommandContext } from "."
 
-const props = withDefaults(defineProps<ListboxRootProps & { class?: HTMLAttributes["class"] }>(), {
+const props = withDefaults(defineProps<ListboxRootProps & { class?: HTMLAttributes["class"], ignoreFilter?: boolean }>(), {
   modelValue: "",
+  ignoreFilter: false,
 })
 
 const emits = defineEmits<ListboxRootEmits>()
 
-const delegatedProps = reactiveOmit(props, "class")
+const delegatedProps = reactiveOmit(props, "class", "ignoreFilter")
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
 
@@ -46,7 +47,7 @@ function filterItems() {
 
   // Check which items should be included
   for (const [id, value] of allItems.value) {
-    const score = contains(value, filterState.search)
+    const score = props.ignoreFilter ? true : contains(value, filterState.search)
     filterState.filtered.items.set(id, score ? 1 : 0)
     if (score)
       itemCount++
@@ -65,7 +66,7 @@ function filterItems() {
   filterState.filtered.count = itemCount
 }
 
-watch(() => filterState.search, () => {
+watch([() => filterState.search, () => allItems.value.size], () => {
   filterItems()
 })
 
