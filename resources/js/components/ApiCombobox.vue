@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 import { useDebounceFn } from '@vueuse/core';
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 export interface ComboboxItem {
     value: string;
@@ -18,10 +18,12 @@ const props = withDefaults(
         url: string;
         selectItemPlaceholder?: string;
         searchPlaceholder?: string;
+        disabled?: boolean;
     }>(),
     {
         selectItemPlaceholder: 'Select item...',
         searchPlaceholder: 'Type to search...',
+        disabled: false,
     },
 );
 
@@ -69,6 +71,22 @@ const handleSelect = (item: ComboboxItem) => {
     emit('update:modelValue', item);
     open.value = false;
 };
+
+watch(
+    () => props.modelValue,
+    (newValue) => {
+        items.value = newValue ? [newValue] : [];
+        query.value = '';
+    },
+);
+
+watch(
+    () => props.url,
+    () => {
+        items.value = [];
+        query.value = '';
+    },
+);
 </script>
 
 <template>
@@ -77,8 +95,9 @@ const handleSelect = (item: ComboboxItem) => {
             <Button
                 variant="outline"
                 role="combobox"
+                :disabled="disabled"
                 :aria-expanded="open"
-                :class="cn('w-full justify-between', !modelValue && 'text-muted-foreground')"
+                :class="cn('w-full justify-between px-3 font-normal', !modelValue && 'text-muted-foreground')"
             >
                 <span class="truncate">
                     {{ modelValue ? modelValue.label : selectItemPlaceholder }}

@@ -1,3 +1,4 @@
+import type { ComboboxItem } from '@/components/ApiCombobox.vue';
 import type { PageProps } from '@inertiajs/core';
 import type { LucideIcon } from 'lucide-vue-next';
 import type { Config } from 'ziggy-js';
@@ -45,6 +46,14 @@ export interface Repository {
     sync_interval_hours?: number;
     statistics_from: string;
     last_synced_at: string | null;
+}
+
+export interface RepositoryForm {
+    name: string;
+    sync_interval_hours: number;
+    vcs_id?: ComboboxItem | null;
+    vcs_instance_id?: number | null;
+    statistics_from?: string;
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

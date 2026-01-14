@@ -3,14 +3,10 @@ import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RepositoryForm } from '@/types';
 import { InertiaForm } from '@inertiajs/vue3';
 
-const form = defineModel<
-    InertiaForm<{
-        name: string;
-        sync_interval_hours: string;
-    }>
->('form', { required: true });
+const form = defineModel<InertiaForm<RepositoryForm>>('form', { required: true });
 </script>
 
 <template>
@@ -28,11 +24,11 @@ const form = defineModel<
                     <SelectValue placeholder="Select an interval" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="1">Hourly</SelectItem>
-                    <SelectItem value="4">Every 4 hours</SelectItem>
-                    <SelectItem value="6">Every 6 hours</SelectItem>
-                    <SelectItem value="12">Every 12 hours</SelectItem>
-                    <SelectItem value="24">Daily</SelectItem>
+                    <SelectItem :value="1">Hourly</SelectItem>
+                    <SelectItem :value="4">Every 4 hours</SelectItem>
+                    <SelectItem :value="6">Every 6 hours</SelectItem>
+                    <SelectItem :value="12">Every 12 hours</SelectItem>
+                    <SelectItem :value="24">Daily</SelectItem>
                 </SelectContent>
             </Select>
             <InputError :message="form.errors.sync_interval_hours" />

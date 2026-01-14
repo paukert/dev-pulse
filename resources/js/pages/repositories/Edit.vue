@@ -24,7 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const form = useForm({
     name: props.repository.name,
-    sync_interval_hours: String(props.repository.sync_interval_hours),
+    sync_interval_hours: props.repository.sync_interval_hours,
 });
 
 const updateRepository = () => {
