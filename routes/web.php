@@ -29,8 +29,13 @@ Route::middleware(['auth', 'verified', $hasAdminRoleMiddleware])->group(static f
     Route::delete('users', [UserController::class, 'destroy'])
         ->name('users.destroy');
 
+    Route::get('repositories/search', [RepositoryController::class, 'search'])
+        ->name('repositories.search');
+
     Route::resource('repositories', RepositoryController::class)->only([
         'index',
+        'create',
+        'store',
         'edit',
         'update',
         'destroy',

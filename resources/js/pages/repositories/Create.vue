@@ -3,32 +3,39 @@ import Heading from '@/components/Heading.vue';
 import RepositoryForm from '@/components/repositories/RepositoryForm.vue';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem, Repository, RepositoryForm as RepositoryFormType } from '@/types';
+import { type BreadcrumbItem, RepositoryForm as RepositoryFormType } from '@/types';
 import { Head, useForm } from '@inertiajs/vue3';
 
-interface Props {
-    repository: Repository;
-}
-
-const props = defineProps<Props>();
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Repositories',
         href: '/repositories',
     },
     {
-        title: props.repository.name,
+        title: 'Add repository',
         href: '#',
     },
 ];
 
+interface Props {
+    vcs_instances: { id: number; name: string }[];
+}
+
+const props = defineProps<Props>();
+
 const form = useForm<RepositoryFormType>({
-    name: props.repository.name,
-    sync_interval_hours: props.repository.sync_interval_hours,
+    name: '',
+    sync_interval_hours: 4,
+    vcs_id: null,
+    vcs_instance_id: null,
+    statistics_from: new Date().toISOString(),
 });
 
-const updateRepository = () => {
-    form.patch(route('repositories.update', { repository: props.repository.id }), {
+const createRepository = () => {
+    form.transform((data) => ({
+        ...data,
+        vcs_id: data.vcs_id?.value,
+    })).post(route('repositories.store'), {
         preserveScroll: true,
     });
 };
@@ -36,15 +43,15 @@ const updateRepository = () => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head :title="`Edit repository ${props.repository.name}`" />
+        <Head title="Add repository" />
 
         <div class="flex p-4">
             <div class="mx-auto w-1/2 py-10">
-                <Heading title="Edit repository" />
-                <form @submit.prevent="updateRepository">
-                    <RepositoryForm v-model:form="form">
+                <Heading title="Add repository" />
+                <form @submit.prevent="createRepository">
+                    <RepositoryForm v-model:form="form" :is-new-record="true" :vcs_instances="props.vcs_instances">
                         <template #actions>
-                            <Button :disabled="form.processing">Edit repository</Button>
+                            <Button :disabled="form.processing">Add repository</Button>
                         </template>
                     </RepositoryForm>
                 </form>

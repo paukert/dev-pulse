@@ -8,6 +8,8 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
@@ -34,7 +36,10 @@ class Repository extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'vcs_id',
         'name',
+        'statistics_from',
+        'vcs_instance_id',
     ];
 
     public ?Carbon $syncStartedAt = null;
@@ -50,10 +55,14 @@ class Repository extends Model
     /**
      * @return array<string, array<array-key, mixed>>
      */
-    public static function rules(): array
+    public static function rules(?Request $request = null): array
     {
+        $uniqueRule = Rule::unique('repositories')->where(static function (Builder $query) use ($request): Builder {
+            return $query->where('vcs_instance_id', $request->vcs_instance_id);
+        });
+
         return [
-            'vcs_id' => ['required', 'string', 'max:255'],
+            'vcs_id' => ['required', 'string', 'max:255', $uniqueRule],
             'name' => ['required', 'string', 'max:255'],
             'sync_interval' => ['required', 'integer'],
             'sync_interval_hours' => ['required', 'integer', Rule::in([1, 4, 6, 12, 24])],
