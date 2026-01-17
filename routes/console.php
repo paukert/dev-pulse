@@ -18,4 +18,4 @@ Schedule::call(static function (GitProviderFactory $factory): void {
         $provider->syncRepository($repository);
         Log::info("Repository $repository->name was successfully synced");
     }
-})->hourly();
+})->everyMinute();

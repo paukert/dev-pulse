@@ -16,7 +16,7 @@ final readonly class GitLabQueryRepository implements QueryRepository
                     count
                     nodes {
                         id
-                        name
+                        nameWithNamespace
                     }
                 }
             }

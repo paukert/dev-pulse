@@ -46,7 +46,7 @@ final readonly class GitLabMapper implements Mapper
      *     data: array{
      *         projects: array{
      *             count: int,
-     *             nodes: array<array{id: string, name: string}>,
+     *             nodes: array<array{id: string, nameWithNamespace: string}>,
      *         },
      *     },
      * } $data
@@ -56,7 +56,7 @@ final readonly class GitLabMapper implements Mapper
         $repositories = array_map(
             static fn (array $repository): array => [
                 'vcsId' => $repository['id'],
-                'name' => $repository['name'],
+                'name' => $repository['nameWithNamespace'],
             ],
             $data['data']['projects']['nodes']
         );

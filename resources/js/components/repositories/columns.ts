@@ -4,7 +4,7 @@ import { ColumnDef } from '@tanstack/vue-table';
 import { h } from 'vue';
 
 function formatDateTime(value: string | null) {
-    return value === null ? 'Never' : new Date(value).toLocaleDateString('en-GB');
+    return value === null ? 'Never' : new Date(value).toLocaleString('en-GB');
 }
 
 export const columns: ColumnDef<Repository>[] = [
