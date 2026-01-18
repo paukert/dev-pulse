@@ -56,9 +56,9 @@ const closeDropdown = () => {
                             <Button variant="secondary">Cancel</Button>
                         </DialogClose>
 
-                        <DialogClose @click="closeDropdown">
+                        <DialogClose @click="closeDropdown" as-child>
                             <Link :href="props.deleteUrl" method="delete" as="button">
-                                <Button variant="destructive">Delete</Button>
+                                <Button variant="destructive" class="w-full sm:w-auto">Delete</Button>
                             </Link>
                         </DialogClose>
                     </DialogFooter>

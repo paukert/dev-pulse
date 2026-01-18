@@ -46,7 +46,7 @@ const createRepository = () => {
         <Head title="Add repository" />
 
         <div class="flex p-4">
-            <div class="mx-auto w-1/2 py-10">
+            <div class="mx-auto w-full py-10 sm:w-1/2">
                 <Heading title="Add repository" />
                 <form @submit.prevent="createRepository">
                     <RepositoryForm v-model:form="form" :is-new-record="true" :vcs_instances="props.vcs_instances">

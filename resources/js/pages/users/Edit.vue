@@ -51,7 +51,7 @@ const updateUser = () => {
         <Head :title="`Edit user ${props.user.name}`" />
 
         <div class="flex p-4">
-            <div class="mx-auto w-1/2 py-10">
+            <div class="mx-auto w-full py-10 sm:w-1/2">
                 <Heading title="Edit user" description="Do not forget to notify user in case of login credentials change" />
                 <form @submit.prevent="updateUser" class="space-y-6">
                     <div class="grid gap-2">
