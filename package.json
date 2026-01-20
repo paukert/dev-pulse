@@ -13,6 +13,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.19.0",
+        "@types/humanize-duration": "^3.27.4",
         "@types/node": "^22.13.5",
         "@vitejs/plugin-vue": "^6.0.2",
         "@vue/eslint-config-typescript": "^14.3.0",
@@ -35,6 +36,7 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "highcharts-vue": "^2.0.1",
+        "humanize-duration": "^3.33.2",
         "laravel-vite-plugin": "^2.0.1",
         "lucide-vue-next": "^0.555.0",
         "reka-ui": "^2.7.0",
