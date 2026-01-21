@@ -12,6 +12,10 @@ export function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref
     ref.value = typeof updaterOrValue === 'function' ? updaterOrValue(ref.value) : updaterOrValue;
 }
 
-export function formatDuration(seconds: number, largest: number = 1) {
+export function formatDuration(seconds: number | null, largest: number = 1) {
+    if (seconds === null) {
+        return '-';
+    }
+
     return humanizeDuration(seconds * 1000, { largest: largest, round: true });
 }

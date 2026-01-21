@@ -6,7 +6,9 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\UserRole;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -22,6 +24,9 @@ use Illuminate\Support\Carbon;
  * @property ?Carbon $created_at
  * @property ?Carbon $updated_at
  * @property UserRole $role
+ *
+ * Relationships
+ * @property Collection<int, VcsInstanceUser> $vcsInstanceUsers
  */
 class User extends Authenticatable
 {
@@ -71,5 +76,13 @@ class User extends Authenticatable
     public function hasRole(UserRole $role): bool
     {
         return $this->role === $role;
+    }
+
+    /**
+     * @return HasMany<VcsInstanceUser, $this>
+     */
+    public function vcsInstanceUsers(): HasMany
+    {
+        return $this->hasMany(VcsInstanceUser::class);
     }
 }

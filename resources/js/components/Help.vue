@@ -1,0 +1,21 @@
+<script setup lang="ts">
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { CircleQuestionMark } from 'lucide-vue-next';
+
+defineProps<{
+    tooltip: string;
+}>();
+</script>
+
+<template>
+    <TooltipProvider>
+        <Tooltip>
+            <TooltipTrigger as-child>
+                <CircleQuestionMark class="h-4 w-4" />
+            </TooltipTrigger>
+            <TooltipContent>
+                {{ tooltip }}
+            </TooltipContent>
+        </Tooltip>
+    </TooltipProvider>
+</template>
