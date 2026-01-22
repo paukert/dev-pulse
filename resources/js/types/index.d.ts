@@ -56,6 +56,28 @@ export interface RepositoryForm {
     statistics_from?: string;
 }
 
+export interface VcsInstanceUser {
+    username: string;
+}
+
+export interface PullRequest {
+    title: string;
+    state: 'open' | 'merged' | 'closed';
+    created_at: string;
+    repository: Repository;
+    author: VcsInstanceUser;
+    metrics: PullRequestMetrics;
+}
+
+export interface PullRequestMetrics {
+    added_lines: number;
+    deleted_lines: number;
+    files_count: number;
+    merge_time: number | null;
+    time_to_review: number | null;
+    comments_from_reviewers_count: number;
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;
 
 export interface PaginatedResponse<T> {

@@ -9,10 +9,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table';
 
-const props = defineProps<{
-    columns: ColumnDef<TData, TValue>[];
-    paginatedData: PaginatedResponse<TData>;
-}>();
+const props = withDefaults(
+    defineProps<{
+        columns: ColumnDef<TData, TValue>[];
+        paginatedData: PaginatedResponse<TData>;
+        id?: string;
+        pageParamName?: string;
+        perPageParamName?: string;
+    }>(),
+    {
+        pageParamName: 'page',
+        perPageParamName: 'per_page',
+    },
+);
 
 const pagination = ref({
     pageIndex: props.paginatedData.current_page - 1,
@@ -35,10 +44,15 @@ const table = useVueTable({
         router.get(
             props.paginatedData.path,
             {
-                page: pagination.value.pageIndex + 1,
-                per_page: pagination.value.pageSize,
+                ...route().params,
+                [props.pageParamName]: pagination.value.pageIndex + 1,
+                [props.perPageParamName]: pagination.value.pageSize,
             },
-            { preserveState: false, preserveScroll: true },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                ...(props.id ? { only: [props.id] } : {}),
+            },
         );
     },
     state: {
@@ -62,7 +76,7 @@ const table = useVueTable({
             <TableBody>
                 <template v-if="table.getRowModel().rows?.length">
                     <TableRow v-for="row in table.getRowModel().rows" :key="row.id" :data-state="row.getIsSelected() ? 'selected' : undefined">
-                        <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
+                        <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" :class="['py-3', cell.column.columnDef.meta?.cellClass]">
                             <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
                         </TableCell>
                     </TableRow>

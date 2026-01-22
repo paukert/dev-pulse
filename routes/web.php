@@ -3,18 +3,19 @@
 declare(strict_types=1);
 
 use App\Enums\UserRole;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RepositoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 $hasAdminRoleMiddleware = 'role:' . UserRole::ADMIN->value;
 
 Route::redirect('/', 'dashboard')->name('home');
 
-Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(static function (): void {
+    Route::get('dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+});
 
 Route::middleware(['auth', 'verified', $hasAdminRoleMiddleware])->group(static function (): void {
     Route::get('users', [UserController::class, 'index'])

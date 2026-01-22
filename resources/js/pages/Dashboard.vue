@@ -1,16 +1,17 @@
 <script setup lang="ts">
+import DataTable from '@/components/DataTable.vue';
+import { developerMetricsColumns } from '@/components/metrics/columns';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { RangeCalendar } from '@/components/ui/range-calendar';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { cn } from '@/lib/utils';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
-import { DateFormatter, getLocalTimeZone, today } from '@internationalized/date';
+import { type BreadcrumbItem, PaginatedResponse, PullRequest } from '@/types';
+import { Head, router } from '@inertiajs/vue3';
+import { DateFormatter, getLocalTimeZone, parseDate, today } from '@internationalized/date';
 import { Calendar } from 'lucide-vue-next';
 import type { DateRange } from 'reka-ui';
-import { Ref, ref } from 'vue';
-import PlaceholderPattern from '../components/PlaceholderPattern.vue';
+import { Ref, ref, watch } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -19,14 +20,48 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+interface Props {
+    from: string;
+    to: string;
+    developerStats: {
+        data: PaginatedResponse<PullRequest>;
+        config: { id: string; pageParamName: string; perPageParamName: string };
+    };
+}
+
+const props = defineProps<Props>();
+
 const df = new DateFormatter('en-GB');
-const end = today(getLocalTimeZone());
-const start = end.subtract({ days: 7 });
+const start = parseDate(props.from);
+const end = parseDate(props.to);
 
 const dateRange = ref({
     start,
     end,
 }) as Ref<DateRange>;
+
+watch(
+    dateRange,
+    (newRange) => {
+        if (!newRange.start || !newRange.end) {
+            return;
+        }
+
+        router.get(
+            route('dashboard'),
+            {
+                ...route().params,
+                from: newRange.start.toString(),
+                to: newRange.end.toString(),
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    },
+    { deep: true },
+);
 </script>
 
 <template>
@@ -61,20 +96,13 @@ const dateRange = ref({
                     />
                 </PopoverContent>
             </Popover>
-            <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-                <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-                <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-                <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-            </div>
-            <div class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 dark:border-sidebar-border md:min-h-min">
-                <PlaceholderPattern />
-            </div>
+            <DataTable
+                :columns="developerMetricsColumns"
+                :paginated-data="props.developerStats.data"
+                :id="props.developerStats.config.id"
+                :page-param-name="props.developerStats.config.pageParamName"
+                :per-page-param-name="props.developerStats.config.perPageParamName"
+            />
         </div>
     </AppLayout>
 </template>
