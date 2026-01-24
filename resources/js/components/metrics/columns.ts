@@ -38,11 +38,11 @@ const baseColumns: ColumnDef<PullRequest>[] = [
         cell: ({ row }) => {
             const title: string = row.getValue('title');
             return h('div', { class: 'text-left font-medium', title: row.original.repository.name + ': ' + title }, [
-                truncate(title, { length: 40 }),
+                truncate(title, { length: 50 }),
                 h(
                     'div',
                     { class: 'text-muted-foreground max-lg:hidden' },
-                    row.original.author.username + ', ' + formatDateTime(row.original.created_at),
+                    row.original.author.username + ', created ' + formatDateTime(row.original.created_at),
                 ),
             ]);
         },
@@ -102,9 +102,29 @@ export const developerMetricsColumns: ColumnDef<PullRequest>[] = [
     {
         accessorKey: 'metrics.comments_from_reviewers_count',
         id: 'metricsCommentsFromReviewersCount',
-        header: () => h('div', { class: 'text-left' }, 'Reviews'),
+        header: () =>
+            h('span', { class: 'flex gap-1 items-center text-left' }, [
+                'Reviews',
+                h(Help, { tooltip: 'Number of received comments from reviewers' }),
+            ]),
         cell: ({ row }) => {
             return h('div', { class: 'text-left font-medium' }, row.getValue('metricsCommentsFromReviewersCount'));
+        },
+    },
+];
+
+export const reviewerMetricsColumns: ColumnDef<PullRequest>[] = [
+    ...baseColumns,
+    {
+        accessorKey: 'metrics.comments_as_reviewer_count',
+        id: 'metricsCommentsAsReviewerCount',
+        header: () =>
+            h('span', { class: 'flex gap-1 items-center text-left' }, [
+                'Comments',
+                h(Help, { tooltip: 'Number of written comments by selected user' }),
+            ]),
+        cell: ({ row }) => {
+            return h('div', { class: 'text-left font-medium' }, row.getValue('metricsCommentsAsReviewerCount'));
         },
     },
 ];

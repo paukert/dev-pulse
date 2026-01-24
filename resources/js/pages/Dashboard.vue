@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DataTable from '@/components/DataTable.vue';
-import { developerMetricsColumns } from '@/components/metrics/columns';
+import { developerMetricsColumns, reviewerMetricsColumns } from '@/components/metrics/columns';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { RangeCalendar } from '@/components/ui/range-calendar';
@@ -24,6 +24,10 @@ interface Props {
     from: string;
     to: string;
     developerStats: {
+        data: PaginatedResponse<PullRequest>;
+        config: { id: string; pageParamName: string; perPageParamName: string };
+    };
+    reviewerStats: {
         data: PaginatedResponse<PullRequest>;
         config: { id: string; pageParamName: string; perPageParamName: string };
     };
@@ -96,13 +100,30 @@ watch(
                     />
                 </PopoverContent>
             </Popover>
-            <DataTable
-                :columns="developerMetricsColumns"
-                :paginated-data="props.developerStats.data"
-                :id="props.developerStats.config.id"
-                :page-param-name="props.developerStats.config.pageParamName"
-                :per-page-param-name="props.developerStats.config.perPageParamName"
-            />
+
+            <section class="my-4">
+                <h3 class="text-lg font-semibold tracking-tight">User's pull requests</h3>
+                <p class="mb-4 text-sm text-muted-foreground">Recently updated pull requests created by the selected user</p>
+                <DataTable
+                    :columns="developerMetricsColumns"
+                    :paginated-data="props.developerStats.data"
+                    :id="props.developerStats.config.id"
+                    :page-param-name="props.developerStats.config.pageParamName"
+                    :per-page-param-name="props.developerStats.config.perPageParamName"
+                />
+            </section>
+
+            <section class="my-4">
+                <h3 class="text-lg font-semibold tracking-tight">Assigned pull requests</h3>
+                <p class="mb-4 text-sm text-muted-foreground">Recently updated pull requests assigned to the selected user for review</p>
+                <DataTable
+                    :columns="reviewerMetricsColumns"
+                    :paginated-data="props.reviewerStats.data"
+                    :id="props.reviewerStats.config.id"
+                    :page-param-name="props.reviewerStats.config.pageParamName"
+                    :per-page-param-name="props.reviewerStats.config.perPageParamName"
+                />
+            </section>
         </div>
     </AppLayout>
 </template>

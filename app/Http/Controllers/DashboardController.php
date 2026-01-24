@@ -24,9 +24,14 @@ class DashboardController extends Controller
 
     private const string TABLE_DEVELOPER_STATS = 'developerStats';
 
+    private const string REVIEWER_STATS_PAGE_PARAM_NAME = 'reviewer_page',
+        REVIEWER_STATS_PER_PAGE_PARAM_NAME = 'reviewer_per_page';
+
+    private const string TABLE_REVIEWER_STATS = 'reviewerStats';
+
     public function index(Request $request): Response
     {
-        $to = Carbon::make($request->query->get('to')) ?? Carbon::now();
+        $to = Carbon::make($request->query->get('to')) ?? Carbon::now()->modify('midnight');
         $from = Carbon::make($request->query->get('from')) ?? (clone $to)->subDays(7);
         $vcsInstanceUserIds = $request->user()->vcsInstanceUsers()->pluck('id')->toArray();
 
@@ -41,6 +46,14 @@ class DashboardController extends Controller
                     'perPageParamName' => self::DEVELOPER_STATS_PER_PAGE_PARAM_NAME,
                 ],
             ],
+            self::TABLE_REVIEWER_STATS => [
+                'data' => fn () => $this->getReviewerTableStats($request, $vcsInstanceUserIds, $from, $to),
+                'config' => [
+                    'id' => self::TABLE_REVIEWER_STATS,
+                    'pageParamName' => self::REVIEWER_STATS_PAGE_PARAM_NAME,
+                    'perPageParamName' => self::REVIEWER_STATS_PER_PAGE_PARAM_NAME,
+                ],
+            ],
         ]);
     }
 
@@ -50,7 +63,7 @@ class DashboardController extends Controller
      */
     private function getDeveloperTableStats(Request $request, array $vcsInstanceUserIds, CarbonInterface $from, CarbonInterface $to): AbstractPaginator
     {
-        $perPage = $request->query->getInt(self::DEVELOPER_STATS_PER_PAGE_PARAM_NAME, 10);
+        $perPage = $request->query->getInt(self::DEVELOPER_STATS_PER_PAGE_PARAM_NAME, 5);
 
         $commentsFromReviewersQuery = DB::table('comments')
             ->select('pull_request_id', DB::raw('COUNT(comments.id) as count'))
@@ -63,6 +76,29 @@ class DashboardController extends Controller
             ->leftJoinSub($commentsFromReviewersQuery, 'comments_from_reviewers', 'pull_requests.id', '=', 'comments_from_reviewers.pull_request_id')
             ->whereIn('pull_requests.author_id', $vcsInstanceUserIds)
             ->paginate(perPage: $perPage, pageName: self::DEVELOPER_STATS_PAGE_PARAM_NAME)
+            ->through($this->getTransformFnForTableStats())
+            ->withQueryString();
+    }
+
+    /**
+     * @param int[] $vcsInstanceUserIds
+     * @return AbstractPaginator<array-key, mixed>
+     */
+    private function getReviewerTableStats(Request $request, array $vcsInstanceUserIds, CarbonInterface $from, CarbonInterface $to): AbstractPaginator
+    {
+        $perPage = $request->query->getInt(self::REVIEWER_STATS_PER_PAGE_PARAM_NAME, 5);
+
+        $commentsAsReviewerQuery = DB::table('comments')
+            ->select('pull_request_id', DB::raw('COUNT(comments.id) as count'))
+            ->whereIn('vcs_instance_user_id', $vcsInstanceUserIds)
+            ->groupBy('pull_request_id');
+
+        return $this->getBaseTableStatsQuery($from, $to)
+            ->addSelect(['comments_as_reviewer.count AS comments_as_reviewer_count'])
+            ->leftJoinSub($commentsAsReviewerQuery, 'comments_as_reviewer', 'pull_requests.id', '=', 'comments_as_reviewer.pull_request_id')
+            ->join('reviewers', 'pull_requests.id', '=', 'reviewers.pull_request_id')
+            ->whereIn('reviewers.vcs_instance_user_id', $vcsInstanceUserIds)
+            ->paginate(perPage: $perPage, pageName: self::REVIEWER_STATS_PAGE_PARAM_NAME)
             ->through($this->getTransformFnForTableStats())
             ->withQueryString();
     }
@@ -86,6 +122,7 @@ class DashboardController extends Controller
                 'merge_time' => $pullRequest->merge_time !== null ? (int)$pullRequest->merge_time : null,
                 'time_to_review' => $pullRequest->time_to_review !== null ? (int)$pullRequest->time_to_review : null,
                 'comments_from_reviewers_count' => isset($pullRequest->comments_from_reviewers_count) ? (int)$pullRequest->comments_from_reviewers_count : null,
+                'comments_as_reviewer_count' => isset($pullRequest->comments_as_reviewer_count) ? (int)$pullRequest->comments_as_reviewer_count : null,
             ],
         ];
     }
@@ -129,6 +166,7 @@ class DashboardController extends Controller
             ->join('pull_request_metrics', 'pull_requests.id', '=', 'pull_request_metrics.pull_request_id')
             ->leftJoinSub($timeToReviewQuery, 'time_to_review', 'pull_requests.id', '=', 'time_to_review.pull_request_id')
             ->whereDate('pull_requests.updated_at', '>=', $from)
-            ->whereDate('pull_requests.updated_at', '<=', $to);
+            ->whereDate('pull_requests.updated_at', '<=', $to)
+            ->orderBy('pull_requests.updated_at', 'DESC');
     }
 }

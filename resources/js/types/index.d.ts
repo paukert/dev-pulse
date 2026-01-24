@@ -76,6 +76,7 @@ export interface PullRequestMetrics {
     merge_time: number | null;
     time_to_review: number | null;
     comments_from_reviewers_count: number;
+    comments_as_reviewer_count: number;
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;
