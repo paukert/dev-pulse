@@ -12,8 +12,12 @@ export function updateTheme(value: Appearance) {
         const systemTheme = mediaQueryList.matches ? 'dark' : 'light';
 
         document.documentElement.classList.toggle('dark', systemTheme === 'dark');
+        document.body.classList.toggle('highcharts-dark', systemTheme === 'dark');
+        document.body.classList.toggle('highcharts-light', systemTheme !== 'dark');
     } else {
         document.documentElement.classList.toggle('dark', value === 'dark');
+        document.body.classList.toggle('highcharts-dark', value === 'dark');
+        document.body.classList.toggle('highcharts-light', value !== 'dark');
     }
 }
 

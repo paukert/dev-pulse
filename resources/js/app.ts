@@ -3,6 +3,7 @@ import '../css/app.css';
 import { createInertiaApp } from '@inertiajs/vue3';
 import HighchartsVue from 'highcharts-vue';
 import 'highcharts/highcharts-more';
+import 'highcharts/themes/adaptive';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
