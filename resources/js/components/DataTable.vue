@@ -3,7 +3,6 @@ import DataTablePaginator from '@/components/DataTablePaginator.vue';
 import { PaginatedResponse } from '@/types';
 import { router } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
-import { ref } from 'vue';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
@@ -23,11 +22,6 @@ const props = withDefaults(
     },
 );
 
-const pagination = ref({
-    pageIndex: props.paginatedData.current_page - 1,
-    pageSize: props.paginatedData.per_page,
-});
-
 const table = useVueTable({
     get data() {
         return props.paginatedData.data;
@@ -35,18 +29,25 @@ const table = useVueTable({
     get columns() {
         return props.columns;
     },
+    get pageCount() {
+        return props.paginatedData.last_page;
+    },
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    pageCount: props.paginatedData.last_page,
     onPaginationChange: (updater) => {
-        pagination.value = updater instanceof Function ? updater(pagination.value) : updater;
+        const currentState = {
+            pageIndex: props.paginatedData.current_page - 1,
+            pageSize: props.paginatedData.per_page,
+        };
+
+        const nextState = updater instanceof Function ? updater(currentState) : updater;
 
         router.get(
             props.paginatedData.path,
             {
                 ...route().params,
-                [props.pageParamName]: pagination.value.pageIndex + 1,
-                [props.perPageParamName]: pagination.value.pageSize,
+                [props.pageParamName]: nextState.pageIndex + 1,
+                [props.perPageParamName]: nextState.pageSize,
             },
             {
                 preserveState: true,
@@ -57,37 +58,42 @@ const table = useVueTable({
     },
     state: {
         get pagination() {
-            return pagination.value;
+            return {
+                pageIndex: props.paginatedData.current_page - 1,
+                pageSize: props.paginatedData.per_page,
+            };
         },
     },
 });
 </script>
 
 <template>
-    <div class="rounded-md border">
-        <Table>
-            <TableHeader>
-                <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-                    <TableHead v-for="header in headerGroup.headers" :key="header.id">
-                        <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header" :props="header.getContext()" />
-                    </TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                <template v-if="table.getRowModel().rows?.length">
-                    <TableRow v-for="row in table.getRowModel().rows" :key="row.id" :data-state="row.getIsSelected() ? 'selected' : undefined">
-                        <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" :class="['py-3', cell.column.columnDef.meta?.cellClass]">
-                            <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
-                        </TableCell>
+    <div class="space-y-4">
+        <div class="rounded-md border">
+            <Table>
+                <TableHeader>
+                    <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+                        <TableHead v-for="header in headerGroup.headers" :key="header.id">
+                            <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header" :props="header.getContext()" />
+                        </TableHead>
                     </TableRow>
-                </template>
-                <template v-else>
-                    <TableRow>
-                        <TableCell :colspan="columns.length" class="h-24 text-center"> No results. </TableCell>
-                    </TableRow>
-                </template>
-            </TableBody>
-        </Table>
+                </TableHeader>
+                <TableBody>
+                    <template v-if="table.getRowModel().rows?.length">
+                        <TableRow v-for="row in table.getRowModel().rows" :key="row.id" :data-state="row.getIsSelected() ? 'selected' : undefined">
+                            <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" :class="['py-3', cell.column.columnDef.meta?.cellClass]">
+                                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                            </TableCell>
+                        </TableRow>
+                    </template>
+                    <template v-else>
+                        <TableRow>
+                            <TableCell :colspan="columns.length" class="h-24 text-center"> No results. </TableCell>
+                        </TableRow>
+                    </template>
+                </TableBody>
+            </Table>
+        </div>
+        <DataTablePaginator :table="table" />
     </div>
-    <DataTablePaginator :table="table" />
 </template>
