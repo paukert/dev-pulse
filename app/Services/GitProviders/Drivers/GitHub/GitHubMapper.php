@@ -190,7 +190,7 @@ final readonly class GitHubMapper implements Mapper
             $threads[$thread['id']] = new ThreadDTO(
                 vcsId: $thread['id'],
                 // GitHub does not provide information about thread resolution date
-                resolvedAt: null,
+                resolvedAt: $thread['isResolved'] ? now() : null,
                 resolvedBy: $thread['isResolved']
                     ? new UserDTO(username: $thread['resolvedBy']['login'], vcsId: $thread['resolvedBy']['id'])
                     : null,
