@@ -64,6 +64,6 @@ class Reviewer extends Model
             'vcs_instance_user_id' => VcsInstanceUser::upsertFromDTO(userDTO: $reviewer->user, vcsInstance: $pullRequest->repository->vcsInstance),
         ], $reviewers);
 
-        Reviewer::upsert(values: $values, uniqueBy: ['pull_request_id', 'vcs_instance_user_id'], update: ['assigned_at']);
+        Reviewer::insertOrIgnore(values: $values);
     }
 }
