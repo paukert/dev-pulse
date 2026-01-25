@@ -38,6 +38,8 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'from' => $from->toDateString(),
             'to' => $to->toDateString(),
+            'polarChartOptions' => fn () => $this->getPolarChartOptions($vcsInstanceUserIds, $from, $to),
+            'lineChartOptions' => fn () => $this->getLineChartOptions($vcsInstanceUserIds, $from, $to),
             self::TABLE_DEVELOPER_STATS => [
                 'data' => fn () => $this->getDeveloperTableStats($request, $vcsInstanceUserIds, $from, $to),
                 'config' => [
@@ -168,5 +170,153 @@ class DashboardController extends Controller
             ->whereDate('pull_requests.updated_at', '>=', $from)
             ->whereDate('pull_requests.updated_at', '<=', $to)
             ->orderBy('pull_requests.updated_at', 'DESC');
+    }
+
+    /**
+     * @param int[] $vcsInstanceUserIds
+     * @return array<string, mixed>
+     */
+    private function getLineChartOptions(array $vcsInstanceUserIds, CarbonInterface $from, CarbonInterface $to): array
+    {
+        $createdPullRequestsQuery = DB::table('pull_requests')
+            ->select([DB::raw('DATE(created_at) AS date'), DB::raw('COUNT(id) AS count')])
+            ->whereIn('author_id', $vcsInstanceUserIds)
+            ->whereDate('created_at', '>=', $from)
+            ->whereDate('created_at', '<=', $to)
+            ->groupByRaw('DATE(created_at)');
+
+        $mergedPullRequestsQuery = DB::table('pull_requests')
+            ->select([DB::raw('DATE(merged_at) AS date'), DB::raw('COUNT(id) AS count')])
+            ->whereIn('merged_by_user_id', $vcsInstanceUserIds)
+            ->whereDate('merged_at', '>=', $from)
+            ->whereDate('merged_at', '<=', $to)
+            ->groupByRaw('DATE(merged_at)');
+
+        $reviewCommentsQuery = DB::table('reviewers')
+            ->select([DB::raw('DATE(created_at) AS date'), DB::raw('COUNT(comments.id) AS count')])
+            ->join('comments', static function (JoinClause $join): void {
+                $join->on('reviewers.pull_request_id', '=', 'comments.pull_request_id');
+                $join->on('reviewers.vcs_instance_user_id', '=', 'comments.vcs_instance_user_id');
+            })
+            ->whereIn('reviewers.vcs_instance_user_id', $vcsInstanceUserIds)
+            ->whereDate('created_at', '>=', $from)
+            ->whereDate('created_at', '<=', $to)
+            ->groupByRaw('DATE(created_at)');
+
+        $approvesQuery = DB::table('approvers')
+            ->select([DB::raw('DATE(approved_at) AS date'), DB::raw('COUNT(id) AS count')])
+            ->whereIn('vcs_instance_user_id', $vcsInstanceUserIds)
+            ->whereDate('approved_at', '>=', $from)
+            ->whereDate('approved_at', '<=', $to)
+            ->groupByRaw('DATE(approved_at)');
+
+        $createdPullRequests = $createdPullRequestsQuery->pluck('count', 'date')->toArray();
+        $mergedPullRequests = $mergedPullRequestsQuery->pluck('count', 'date')->toArray();
+        $reviewComments = $reviewCommentsQuery->pluck('count', 'date')->toArray();
+        $approves = $approvesQuery->pluck('count', 'date')->toArray();
+
+        return [
+            'series' => [
+                [
+                    'name' => __('Opened PRs'),
+                    'color' => '#ADD747',
+                    'data' => $this->fillMissingValues($createdPullRequests, $from, $to),
+                ],
+                [
+                    'name' => __('Merged PRs'),
+                    'color' => '#8E51FF',
+                    'data' => $this->fillMissingValues($mergedPullRequests, $from, $to),
+                ],
+                [
+                    'name' => __('Review comments'),
+                    'color' => '#00A6DE',
+                    'data' => $this->fillMissingValues($reviewComments, $from, $to),
+                ],
+                [
+                    'name' => __('Approves'),
+                    'color' => '#DE9413',
+                    'data' => $this->fillMissingValues($approves, $from, $to),
+                ],
+            ],
+            'xAxis' => [
+                'max' => $to->getTimestamp() * 1000,
+                'min' => $from->getTimestamp() * 1000,
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, int> $data
+     * @return list<array{x: int, y: int}>
+     */
+    private function fillMissingValues(array $data, CarbonInterface $from, CarbonInterface $to): array
+    {
+        $result = [];
+        $date = clone $from;
+
+        while ($date <= $to) {
+            $value = $data[$date->format('Y-m-d')] ?? 0;
+            $result[] = ['x' => $date->getTimestamp() * 1000, 'y' => $value];
+            $date = $date->modify('+1 day');
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param int[] $vcsInstanceUserIds
+     * @return array<string, mixed>
+     */
+    private function getPolarChartOptions(array $vcsInstanceUserIds, CarbonInterface $from, CarbonInterface $to): array
+    {
+        $createdPullRequestsCount = DB::table('pull_requests')
+            ->whereIn('author_id', $vcsInstanceUserIds)
+            ->whereDate('created_at', '>=', $from)
+            ->whereDate('created_at', '<=', $to)
+            ->count();
+
+        $commentsCount = DB::table('comments')
+            ->whereIn('vcs_instance_user_id', $vcsInstanceUserIds)
+            ->whereDate('created_at', '>=', $from)
+            ->whereDate('created_at', '<=', $to)
+            ->count();
+
+        $resolvedThreadsCount = DB::table('threads')
+            ->whereIn('resolved_by_user_id', $vcsInstanceUserIds)
+            ->whereDate('resolved_at', '>=', $from)
+            ->whereDate('resolved_at', '<=', $to)
+            ->count();
+
+        $approvesCount = DB::table('approvers')
+            ->whereIn('vcs_instance_user_id', $vcsInstanceUserIds)
+            ->whereDate('approved_at', '>=', $from)
+            ->whereDate('approved_at', '<=', $to)
+            ->count();
+
+        $stats = [
+            $createdPullRequestsCount,
+            $commentsCount,
+            $resolvedThreadsCount,
+            $approvesCount,
+        ];
+
+        $total = array_sum($stats);
+        $data = array_map(
+            static fn (int $count): float => $total > 0 ? round(($count / $total) * 100) : 0.0,
+            $stats
+        );
+
+        return [
+            'series' => [
+                [
+                    'color' => '#8E51FF',
+                    'data' => $data,
+                    'pointPlacement' => 'on',
+                ],
+            ],
+            'xAxis' => [
+                'categories' => [__('Created PRs'), __('Comments'), __('Resolved threads'), __('Approves')],
+            ],
+        ];
     }
 }

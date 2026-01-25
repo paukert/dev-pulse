@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import LineChart from '@/components/charts/LineChart.vue';
+import PolarChart from '@/components/charts/PolarChart.vue';
 import DataTable from '@/components/DataTable.vue';
 import { developerMetricsColumns, reviewerMetricsColumns } from '@/components/metrics/columns';
 import { Button } from '@/components/ui/button';
@@ -23,6 +25,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface Props {
     from: string;
     to: string;
+    polarChartOptions: object;
+    lineChartOptions: object;
     developerStats: {
         data: PaginatedResponse<PullRequest>;
         config: { id: string; pageParamName: string; perPageParamName: string };
@@ -100,6 +104,18 @@ watch(
                     />
                 </PopoverContent>
             </Popover>
+
+            <section class="my-4">
+                <h3 class="text-lg font-semibold tracking-tight">User's activity</h3>
+                <div class="flex flex-col gap-10 lg:flex-row">
+                    <div class="w-full lg:w-1/2">
+                        <PolarChart :options="polarChartOptions" />
+                    </div>
+                    <div class="w-full lg:w-1/2">
+                        <LineChart :options="lineChartOptions" />
+                    </div>
+                </div>
+            </section>
 
             <section class="my-4">
                 <h3 class="text-lg font-semibold tracking-tight">User's pull requests</h3>
