@@ -108,7 +108,7 @@ class DashboardController extends Controller
         return static fn (stdClass $pullRequest): array => [
             'title' => (string)$pullRequest->title,
             'state' => (string)$pullRequest->state,
-            'created_at' => Carbon::parse($pullRequest->created_at)->format(DateTimeInterface::ATOM),
+            'updated_at' => Carbon::parse($pullRequest->updated_at)->format(DateTimeInterface::ATOM),
             'repository' => [
                 'name' => (string)$pullRequest->repository_name,
             ],
@@ -152,7 +152,7 @@ class DashboardController extends Controller
             ->select([
                 'pull_requests.title',
                 'pull_requests.state',
-                'pull_requests.created_at',
+                'pull_requests.updated_at',
                 'repositories.name AS repository_name',
                 'vcs_instance_users.username AS author_username',
                 'pull_request_metrics.added_lines AS added_lines',

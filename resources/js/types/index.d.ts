@@ -63,7 +63,7 @@ export interface VcsInstanceUser {
 export interface PullRequest {
     title: string;
     state: 'open' | 'merged' | 'closed';
-    created_at: string;
+    updated_at: string;
     repository: Repository;
     author: VcsInstanceUser;
     metrics: PullRequestMetrics;

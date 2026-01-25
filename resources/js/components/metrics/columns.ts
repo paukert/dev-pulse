@@ -42,7 +42,7 @@ const baseColumns: ColumnDef<PullRequest>[] = [
                 h(
                     'div',
                     { class: 'text-muted-foreground max-lg:hidden' },
-                    row.original.author.username + ', created ' + formatDateTime(row.original.created_at),
+                    row.original.author.username + ', updated ' + formatDateTime(row.original.updated_at),
                 ),
             ]);
         },
