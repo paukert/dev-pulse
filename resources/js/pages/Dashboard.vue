@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ApiCombobox, { type ComboboxItem } from '@/components/ApiCombobox.vue';
 import LineChart from '@/components/charts/LineChart.vue';
 import PolarChart from '@/components/charts/PolarChart.vue';
 import DataTable from '@/components/DataTable.vue';
@@ -11,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, PaginatedResponse, PullRequest } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import { DateFormatter, getLocalTimeZone, parseDate, today } from '@internationalized/date';
+import { xorBy } from 'lodash-es';
 import { Calendar } from 'lucide-vue-next';
 import type { DateRange } from 'reka-ui';
 import { Ref, ref, watch } from 'vue';
@@ -23,6 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface Props {
+    users: ComboboxItem[];
     from: string;
     to: string;
     polarChartOptions: object;
@@ -38,6 +41,35 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const selectedUsers = ref<ComboboxItem[]>(props.users);
+
+watch(
+    selectedUsers,
+    (newUsers) => {
+        router.get(
+            route('dashboard'),
+            {
+                ...route().params,
+                userIds: newUsers.map((user) => user.value),
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    },
+    { deep: true },
+);
+
+watch(
+    () => props.users,
+    (newUsers) => {
+        if (xorBy(newUsers, selectedUsers.value, 'value').length === 0) {
+            return;
+        }
+        selectedUsers.value = newUsers;
+    },
+);
 
 const df = new DateFormatter('en-GB');
 const start = parseDate(props.from);
@@ -77,33 +109,47 @@ watch(
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <Popover>
-                <PopoverTrigger as-child>
-                    <Button variant="outline" :class="cn('self-end px-3')">
-                        <Calendar />
-                        <template v-if="dateRange.start">
-                            <template v-if="dateRange.end">
-                                {{ df.format(dateRange.start.toDate(getLocalTimeZone())) }} -
-                                {{ df.format(dateRange.end.toDate(getLocalTimeZone())) }}
-                            </template>
-                            <template v-else>
-                                {{ df.format(dateRange.start.toDate(getLocalTimeZone())) }}
-                            </template>
-                        </template>
-                        <template v-else>Select date range</template>
-                    </Button>
-                </PopoverTrigger>
-
-                <PopoverContent class="w-auto p-0" align="end">
-                    <RangeCalendar
-                        v-model="dateRange"
-                        class="rounded-md border shadow-sm"
-                        :maximum-days="31"
-                        :max-value="today(getLocalTimeZone())"
-                        :number-of-months="2"
+            <div class="flex w-full flex-col justify-between gap-2 md:flex-row">
+                <div class="w-full md:w-1/2 lg:w-1/3">
+                    <ApiCombobox
+                        v-model="selectedUsers"
+                        :url="route('users.search')"
+                        :allow-multiple-selection="true"
+                        select-item-placeholder="Select users"
+                        search-placeholder="Search users..."
                     />
-                </PopoverContent>
-            </Popover>
+                </div>
+
+                <div class="w-full md:w-auto">
+                    <Popover>
+                        <PopoverTrigger as-child>
+                            <Button variant="outline" :class="cn('w-full justify-start self-end px-3')">
+                                <Calendar />
+                                <template v-if="dateRange.start">
+                                    <template v-if="dateRange.end">
+                                        {{ df.format(dateRange.start.toDate(getLocalTimeZone())) }} -
+                                        {{ df.format(dateRange.end.toDate(getLocalTimeZone())) }}
+                                    </template>
+                                    <template v-else>
+                                        {{ df.format(dateRange.start.toDate(getLocalTimeZone())) }}
+                                    </template>
+                                </template>
+                                <template v-else>Select date range</template>
+                            </Button>
+                        </PopoverTrigger>
+
+                        <PopoverContent class="w-auto p-0" align="end">
+                            <RangeCalendar
+                                v-model="dateRange"
+                                class="rounded-md border shadow-sm"
+                                :maximum-days="31"
+                                :max-value="today(getLocalTimeZone())"
+                                :number-of-months="2"
+                            />
+                        </PopoverContent>
+                    </Popover>
+                </div>
+            </div>
 
             <section class="my-4">
                 <h3 class="text-lg font-semibold tracking-tight">User's activity</h3>

@@ -15,6 +15,9 @@ Route::redirect('/', 'dashboard')->name('home');
 Route::middleware(['auth', 'verified'])->group(static function (): void {
     Route::get('dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
+
+    Route::get('users/search', [UserController::class, 'search'])
+        ->name('users.search');
 });
 
 Route::middleware(['auth', 'verified', $hasAdminRoleMiddleware])->group(static function (): void {

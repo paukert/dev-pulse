@@ -7,8 +7,10 @@ namespace App\Http\Controllers;
 use App\Enums\UserRole;
 use App\Http\Requests\Users\UserUpdateRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -63,5 +65,16 @@ class UserController extends Controller
         $user->delete();
 
         return to_route('users.index');
+    }
+
+    public function search(Request $request): JsonResponse
+    {
+        $users = DB::table('users')
+            ->select(['id AS value', 'name AS label'])
+            ->whereLike('name', "%{$request->query->getString('query')}%")
+            ->limit(10)
+            ->get();
+
+        return response()->json($users);
     }
 }

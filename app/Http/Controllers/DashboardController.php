@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\VcsInstanceUser;
 use Carbon\CarbonInterface;
 use Closure;
 use DateTimeInterface;
@@ -33,9 +34,19 @@ class DashboardController extends Controller
     {
         $to = Carbon::make($request->query->get('to')) ?? Carbon::now()->modify('midnight');
         $from = Carbon::make($request->query->get('from')) ?? (clone $to)->subDays(7);
-        $vcsInstanceUserIds = $request->user()->vcsInstanceUsers()->pluck('id')->toArray();
+
+        $userIds = $request->query('userIds', $request->user()->id);
+        $userIds = is_array($userIds) ? $userIds : [$userIds];
+        $usersQuery = DB::table('users')
+            ->select(['id AS value', 'name AS label'])
+            ->whereIn('id', $userIds);
+        $vcsInstanceUserIds = VcsInstanceUser::query()
+            ->whereIn('user_id', $userIds)
+            ->pluck('id')
+            ->toArray();
 
         return Inertia::render('Dashboard', [
+            'users' => fn () => $usersQuery->get()->toArray(),
             'from' => $from->toDateString(),
             'to' => $to->toDateString(),
             'polarChartOptions' => fn () => $this->getPolarChartOptions($vcsInstanceUserIds, $from, $to),
