@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ApiCombobox, { type ComboboxItem } from '@/components/ApiCombobox.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { Head, useForm } from '@inertiajs/vue3';
 
 interface Props {
     user: User;
+    vcsInstanceUsers: ComboboxItem[];
     roles: Record<string, string>;
 }
 
@@ -29,13 +31,17 @@ const breadcrumbs: BreadcrumbItem[] = [
 const form = useForm({
     name: props.user.name,
     role: props.user.role,
+    vcs_instance_users: props.vcsInstanceUsers,
     email: props.user.email,
     password: '',
     password_confirmation: '',
 });
 
 const updateUser = () => {
-    form.patch(route('users.update', { id: props.user.id }), {
+    form.transform((data) => ({
+        ...data,
+        vcs_instance_users: data.vcs_instance_users.map((i: ComboboxItem) => i.value),
+    })).patch(route('users.update', { id: props.user.id }), {
         preserveScroll: true,
         onError: (errors: any) => {
             if (errors.password) {
@@ -71,6 +77,19 @@ const updateUser = () => {
                             </SelectContent>
                         </Select>
                         <InputError :message="form.errors.role" />
+                    </div>
+
+                    <div class="grid gap-2">
+                        <Label for="vcs_instance_users">Associated accounts</Label>
+                        <ApiCombobox
+                            id="vcs_instance_users"
+                            v-model="form.vcs_instance_users"
+                            :url="route('vcs-instance-users.search')"
+                            :allow-multiple-selection="true"
+                            select-item-placeholder="Select associated accounts"
+                            search-placeholder="Search associated accounts..."
+                        />
+                        <InputError :message="form.errors.vcs_instance_users" />
                     </div>
 
                     <div class="grid gap-2">

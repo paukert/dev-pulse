@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RepositoryController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VcsInstanceUserController;
 use Illuminate\Support\Facades\Route;
 
 $hasAdminRoleMiddleware = 'role:' . UserRole::ADMIN->value;
@@ -32,6 +33,9 @@ Route::middleware(['auth', 'verified', $hasAdminRoleMiddleware])->group(static f
 
     Route::delete('users', [UserController::class, 'destroy'])
         ->name('users.destroy');
+
+    Route::get('vcs-instance-users/search', [VcsInstanceUserController::class, 'search'])
+        ->name('vcs-instance-users.search');
 
     Route::get('repositories/search', [RepositoryController::class, 'search'])
         ->name('repositories.search');

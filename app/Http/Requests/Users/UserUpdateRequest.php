@@ -6,6 +6,7 @@ namespace App\Http\Requests\Users;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Models\VcsInstanceUser;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -30,6 +31,12 @@ class UserUpdateRequest extends FormRequest
                 'email',
                 'max:255',
                 Rule::unique(User::class)->ignore($request->route()->parameter('id')),
+            ],
+            'vcs_instance_users' => ['array'],
+            'vcs_instance_users.*' => [
+                'integer',
+                'distinct',
+                Rule::exists(VcsInstanceUser::class, 'id'),
             ],
         ];
 

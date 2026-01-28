@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Enums\UserRole;
 use App\Http\Requests\Users\UserUpdateRequest;
 use App\Models\User;
+use App\Models\VcsInstanceUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -37,6 +38,10 @@ class UserController extends Controller
 
         return Inertia::render('users/Edit', [
             'user' => $user->only(['id', 'name', 'role', 'email']),
+            'vcsInstanceUsers' => $user->vcsInstanceUsers->map(static fn (VcsInstanceUser $vcsInstanceUser): array => [
+                'value' => $vcsInstanceUser->id,
+                'label' => "{$vcsInstanceUser->vcsInstance->name} / $vcsInstanceUser->username",
+            ]),
             'roles' => UserRole::getLabels(),
         ]);
     }
@@ -47,7 +52,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $validated = $request->safe();
-        $user->fill($validated->except(['role']));
+        $user->fill($validated->except(['role', 'vcs_instance_users']));
         $user->role = $validated['role'] ?? $user->role;
 
         if ($user->isDirty('email')) {
@@ -55,6 +60,18 @@ class UserController extends Controller
         }
 
         $user->save();
+
+        DB::transaction(static function () use ($user, $validated): void {
+            VcsInstanceUser::query()
+                ->where('user_id', '=', $user->id)
+                ->update(['user_id' => null]);
+
+            if (count($validated['vcs_instance_users'] ?? []) !== 0) {
+                VcsInstanceUser::query()
+                    ->whereIn('id', $validated['vcs_instance_users'])
+                    ->update(['user_id' => $user->id]);
+            }
+        });
 
         return to_route('users.edit', ['id' => $id]);
     }

@@ -29,6 +29,10 @@ class VcsInstanceUser extends Model
     /** @use HasFactory<\Database\Factories\VcsInstanceUserFactory> */
     use HasFactory;
 
+    protected $fillable = [
+        'user_id',
+    ];
+
     public $timestamps = false;
 
     /**
