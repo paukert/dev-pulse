@@ -41,7 +41,7 @@ final readonly class GitProvider
     public function getAvailableRepositories(?string $filterValue = null): RepositoriesListDTO
     {
         $filterValue = match ($this->vcsInstance->platform) {
-            VcsPlatform::GITHUB => "$filterValue in:name sort:name-asc",
+            VcsPlatform::GITHUB => "repo:$filterValue",
             default => $filterValue,
         };
 

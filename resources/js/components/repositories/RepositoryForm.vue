@@ -70,6 +70,7 @@ watch(
                 search-placeholder="Search repositories..."
             />
             <InputError :message="form.errors.vcs_id" />
+            <p class="text-sm text-muted-foreground">GitHub repositories have to be searched using "owner/name" pattern</p>
         </div>
 
         <div class="grid gap-2">
