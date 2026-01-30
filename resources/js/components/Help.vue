@@ -11,7 +11,7 @@ defineProps<{
     <TooltipProvider>
         <Tooltip>
             <TooltipTrigger as-child>
-                <CircleQuestionMark class="h-4 w-4" />
+                <CircleQuestionMark class="h-4 w-4 cursor-help" />
             </TooltipTrigger>
             <TooltipContent>
                 {{ tooltip }}

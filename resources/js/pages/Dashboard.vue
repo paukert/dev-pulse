@@ -152,7 +152,7 @@ watch(
             </div>
 
             <section class="my-4">
-                <h3 class="text-lg font-semibold tracking-tight">User's activity</h3>
+                <h3 class="text-lg font-semibold tracking-tight">Selected users' activity</h3>
                 <div class="flex flex-col gap-10 lg:flex-row">
                     <div class="w-full lg:w-1/2">
                         <PolarChart :options="polarChartOptions" />
@@ -164,8 +164,8 @@ watch(
             </section>
 
             <section class="my-4">
-                <h3 class="text-lg font-semibold tracking-tight">User's pull requests</h3>
-                <p class="mb-4 text-sm text-muted-foreground">Recently updated pull requests created by the selected user</p>
+                <h3 class="text-lg font-semibold tracking-tight">Created pull requests</h3>
+                <p class="mb-4 text-sm text-muted-foreground">Recently updated pull requests created by the selected users</p>
                 <DataTable
                     :columns="developerMetricsColumns"
                     :paginated-data="props.developerStats.data"
@@ -177,7 +177,7 @@ watch(
 
             <section class="my-4">
                 <h3 class="text-lg font-semibold tracking-tight">Assigned pull requests</h3>
-                <p class="mb-4 text-sm text-muted-foreground">Recently updated pull requests assigned to the selected user for review</p>
+                <p class="mb-4 text-sm text-muted-foreground">Recently updated pull requests assigned to the selected users for review</p>
                 <DataTable
                     :columns="reviewerMetricsColumns"
                     :paginated-data="props.reviewerStats.data"
