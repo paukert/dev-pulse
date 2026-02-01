@@ -21,3 +21,7 @@ Všechny kontejnery lze naopak zastavit pomocí `docker-compose down`.
 V rámci běhu databázových migrací bude vytvořen uživatel s administrátorskou rolí:
 - e-mail: `admin@devpulse.com`
 - heslo: `password`
+
+<img src="https://fit.cvut.cz/static/images/fit-cvut-logo-cs.svg" alt="logo FIT ČVUT" height="100">
+
+Tento software vznikl za podpory **Fakulty informačních technologií ČVUT v Praze**. Více informací naleznete na [fit.cvut.cz](https://fit.cvut.cz).
