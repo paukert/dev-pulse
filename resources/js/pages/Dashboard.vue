@@ -142,7 +142,7 @@ watch(
                             <RangeCalendar
                                 v-model="dateRange"
                                 class="rounded-md border shadow-sm"
-                                :maximum-days="31"
+                                :maximum-days="365"
                                 :max-value="today(getLocalTimeZone())"
                                 :number-of-months="2"
                             />
