@@ -41,6 +41,7 @@ class UserController extends Controller
             'vcsInstanceUsers' => $user->vcsInstanceUsers->map(static fn (VcsInstanceUser $vcsInstanceUser): array => [
                 'value' => $vcsInstanceUser->id,
                 'label' => "{$vcsInstanceUser->vcsInstance->name} / $vcsInstanceUser->username",
+                'badge' => $vcsInstanceUser->vcsInstance->platform->getLabel(),
             ]),
             'roles' => UserRole::getLabels(),
         ]);

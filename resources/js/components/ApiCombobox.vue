@@ -11,6 +11,7 @@ import { computed, ref, watch } from 'vue';
 export interface ComboboxItem {
     value: string;
     label: string;
+    badge?: string;
 }
 
 const props = withDefaults(
@@ -185,6 +186,7 @@ watch(open, (isOpen) => {
                         >
                             <Check :class="cn('mr-2 h-4 w-4', isSelected(item) ? 'opacity-100' : 'opacity-0')" />
                             {{ item.label }}
+                            <Badge v-if="item.badge" variant="secondary">{{ item.badge }}</Badge>
                         </CommandItem>
                     </CommandGroup>
                 </CommandList>
