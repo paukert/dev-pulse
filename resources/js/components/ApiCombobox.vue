@@ -176,7 +176,13 @@ watch(open, (isOpen) => {
                     <CommandEmpty v-if="!loading && query && items.length === 0">No results</CommandEmpty>
 
                     <CommandGroup v-if="!loading && items.length > 0">
-                        <CommandItem v-for="item in items" :key="item.value" :value="item.value" @select="() => handleSelect(item)">
+                        <CommandItem
+                            v-for="item in items"
+                            :key="item.value"
+                            :value="item.value"
+                            @select="() => handleSelect(item)"
+                            :class="cn('cursor-pointer')"
+                        >
                             <Check :class="cn('mr-2 h-4 w-4', isSelected(item) ? 'opacity-100' : 'opacity-0')" />
                             {{ item.label }}
                         </CommandItem>
