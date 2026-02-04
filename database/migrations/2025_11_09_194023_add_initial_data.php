@@ -15,7 +15,7 @@ return new class () extends Migration {
     public function up(): void
     {
         // Create default admin user
-        User::factory()->create([
+        User::forceCreate([
             'name' => 'Admin',
             'email' => 'admin@devpulse.com',
             'email_verified_at' => now(),

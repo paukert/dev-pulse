@@ -1,0 +1,11 @@
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
+node_modules/
+public/build/
+public/hot
+storage/*/
+!storage/**/.gitignore
+vendor/
+
+.env
+.git
