@@ -66,7 +66,13 @@ const fetchItems = async (query: string) => {
         url.searchParams.set('query', query);
 
         const res = await fetch(url);
-        items.value = await res.json();
+        const apiResults: ComboboxItem[] = await res.json();
+
+        const selected = getSelectedItems();
+        const selectedValues = new Set(selected.map((i) => i.value));
+        const uniqueApiResults = apiResults.filter((i) => !selectedValues.has(i.value));
+
+        items.value = [...selected, ...uniqueApiResults];
     } catch (err: any) {
         console.error('Failed to fetch items', err);
         items.value = getSelectedItems();
