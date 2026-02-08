@@ -22,6 +22,13 @@ V rámci běhu databázových migrací bude vytvořen uživatel s administrátor
 - e-mail: `admin@devpulse.com`
 - heslo: `password`
 
+## Poděkování
 <img src="https://fit.cvut.cz/static/images/fit-cvut-logo-cs.svg" alt="logo FIT ČVUT" height="100">
 
 Tento software vznikl za podpory **Fakulty informačních technologií ČVUT v Praze**. Více informací naleznete na [fit.cvut.cz](https://fit.cvut.cz).
+
+## Licence
+Tato aplikace je open-source software licencovaný pod [MIT licencí](LICENSE).
+
+### Upozornění k použitým knihovnám
+Tento projekt využívá knihovnu Highcharts pro vizualizaci dat. Tato knihovna **není** šířena pod MIT licencí a vztahují se na ni vlastní licenční podmínky společnosti Highsoft AS. Pro její využívání je nezbytné si obstarat odpovídající licenci (včetně licencí pro nekomerční/akademické účely) na [shop.highcharts.com](https://shop.highcharts.com/).
