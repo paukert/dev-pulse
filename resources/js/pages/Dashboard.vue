@@ -176,8 +176,8 @@ watch(
             </section>
 
             <section class="my-4">
-                <h3 class="text-lg font-semibold tracking-tight">Assigned pull requests</h3>
-                <p class="mb-4 text-sm text-muted-foreground">Recently updated pull requests assigned to the selected users for review</p>
+                <h3 class="text-lg font-semibold tracking-tight">Code reviews</h3>
+                <p class="mb-4 text-sm text-muted-foreground">Recently updated pull requests where the selected users were requested as reviewers</p>
                 <DataTable
                     :columns="reviewerMetricsColumns"
                     :paginated-data="props.reviewerStats.data"
