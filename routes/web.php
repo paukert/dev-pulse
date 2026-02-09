@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\UserRole;
+use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RepositoryController;
 use App\Http\Controllers\UserController;
@@ -19,6 +20,10 @@ Route::middleware(['auth', 'verified'])->group(static function (): void {
 
     Route::get('users/search', [UserController::class, 'search'])
         ->name('users.search');
+
+    Route::resource('challenges', ChallengeController::class)->only([
+        'index',
+    ]);
 });
 
 Route::middleware(['auth', 'verified', $hasAdminRoleMiddleware])->group(static function (): void {
@@ -46,6 +51,10 @@ Route::middleware(['auth', 'verified', $hasAdminRoleMiddleware])->group(static f
         'store',
         'edit',
         'update',
+        'destroy',
+    ]);
+
+    Route::resource('challenges', ChallengeController::class)->only([
         'destroy',
     ]);
 });

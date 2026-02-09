@@ -12,6 +12,14 @@ export interface BreadcrumbItem {
     href: string;
 }
 
+export interface Challenge {
+    id: number;
+    name: string;
+    description: string;
+    active_from: string;
+    active_to: string;
+}
+
 export interface NavItem {
     title: string;
     href: string;

@@ -58,9 +58,8 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Challenges',
-        href: '#',
+        href: '/challenges',
         icon: Swords,
-        isVisible: false,
     },
 ].filter((item) => item.isVisible !== false);
 
