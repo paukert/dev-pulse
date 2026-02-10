@@ -3,6 +3,16 @@ import type { PageProps } from '@inertiajs/core';
 import type { LucideIcon } from 'lucide-vue-next';
 import type { Config } from 'ziggy-js';
 
+export interface Activity {
+    id: number;
+    type: string;
+    needed_actions_count: number;
+}
+
+export interface ActivityForm extends Activity {
+    isNewRecord?: boolean;
+}
+
 export interface Auth {
     user: User;
 }
@@ -18,6 +28,11 @@ export interface Challenge {
     description: string;
     active_from: string;
     active_to: string;
+}
+
+export interface ChallengeForm extends Omit<Challenge, 'id'> {
+    id?: number;
+    activities: ActivityForm[];
 }
 
 export interface NavItem {

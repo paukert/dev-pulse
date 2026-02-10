@@ -55,6 +55,8 @@ Route::middleware(['auth', 'verified', $hasAdminRoleMiddleware])->group(static f
     ]);
 
     Route::resource('challenges', ChallengeController::class)->only([
+        'create',
+        'store',
         'destroy',
     ]);
 });
