@@ -28,8 +28,8 @@ const user = page.props.auth.user as User;
     <Head title="Challenges" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div v-if="user.isAdmin" class="flex justify-end py-4">
+        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl px-4 py-6">
+            <div v-if="user.isAdmin" class="flex justify-end">
                 <Link :href="route('challenges.create')" as="button">
                     <Button><Plus /> Add challenge</Button>
                 </Link>

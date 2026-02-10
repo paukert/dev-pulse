@@ -108,7 +108,7 @@ watch(
     <Head title="Dashboard" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl px-4 py-6">
             <div class="flex w-full flex-col justify-between gap-2 md:flex-row">
                 <div class="w-full md:w-1/2 lg:w-1/3">
                     <ApiCombobox

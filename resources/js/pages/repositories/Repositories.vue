@@ -25,8 +25,8 @@ const props = defineProps<Props>();
     <Head title="Repositories" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div class="flex justify-end py-4">
+        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl px-4 py-6">
+            <div class="flex justify-end">
                 <Link :href="route('repositories.create')" as="button">
                     <Button><Plus /> Add repository</Button>
                 </Link>
