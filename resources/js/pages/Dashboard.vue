@@ -3,17 +3,19 @@ import ApiCombobox, { type ComboboxItem } from '@/components/ApiCombobox.vue';
 import LineChart from '@/components/charts/LineChart.vue';
 import PolarChart from '@/components/charts/PolarChart.vue';
 import DataTable from '@/components/DataTable.vue';
+import Help from '@/components/Help.vue';
 import { developerMetricsColumns, reviewerMetricsColumns } from '@/components/metrics/columns';
+import Panel from '@/components/Panel.vue';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { RangeCalendar } from '@/components/ui/range-calendar';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { cn } from '@/lib/utils';
+import { cn, formatDuration } from '@/lib/utils';
 import { type BreadcrumbItem, PaginatedResponse, PullRequest } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import { DateFormatter, getLocalTimeZone, parseDate, today } from '@internationalized/date';
 import { xorBy } from 'lodash-es';
-import { Calendar } from 'lucide-vue-next';
+import { Calendar, FileDiff, GitMerge, Timer, Trophy } from 'lucide-vue-next';
 import type { DateRange } from 'reka-ui';
 import { Ref, ref, watch } from 'vue';
 
@@ -28,6 +30,12 @@ interface Props {
     users: ComboboxItem[];
     from: string;
     to: string;
+    overallStats: {
+        badgesEarned: number;
+        averageTimeToReview: number | null;
+        averageMergeTime: number | null;
+        totalLinesChanged: number;
+    };
     polarChartOptions: object;
     lineChartOptions: object;
     developerStats: {
@@ -149,6 +157,28 @@ watch(
                         </PopoverContent>
                     </Popover>
                 </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <Panel :value="overallStats.badgesEarned" label="Completed challenges" :icon="Trophy" icon-color="yellow" />
+                <Panel :value="formatDuration(overallStats.averageTimeToReview)" :icon="Timer" icon-color="blue">
+                    <template #label>
+                        Average time to review
+                        <Help tooltip="Average time from assignment to the reviewer's first comment or approval in PRs reviewed by selected users" />
+                    </template>
+                </Panel>
+                <Panel :value="formatDuration(overallStats.averageMergeTime)" :icon="GitMerge" icon-color="violet">
+                    <template #label>
+                        Average merge time
+                        <Help tooltip="Average time from the creation of a pull request to its merging in PRs created by the selected users" />
+                    </template>
+                </Panel>
+                <Panel :value="overallStats.totalLinesChanged" :icon="FileDiff" icon-color="orange">
+                    <template #label>
+                        Total lines changed
+                        <Help tooltip="Total number of lines changed in PRs created by the selected users" />
+                    </template>
+                </Panel>
             </div>
 
             <section class="my-4">

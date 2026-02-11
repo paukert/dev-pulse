@@ -49,6 +49,7 @@ class DashboardController extends Controller
             'users' => fn () => $usersQuery->get()->toArray(),
             'from' => $from->toDateString(),
             'to' => $to->toDateString(),
+            'overallStats' => fn () => $this->getOverallStats($vcsInstanceUserIds, $from, $to),
             'polarChartOptions' => fn () => $this->getPolarChartOptions($vcsInstanceUserIds, $from, $to),
             'lineChartOptions' => fn () => $this->getLineChartOptions($vcsInstanceUserIds, $from, $to),
             self::TABLE_DEVELOPER_STATS => [
@@ -68,6 +69,53 @@ class DashboardController extends Controller
                 ],
             ],
         ]);
+    }
+
+    /**
+     * @param int[] $vcsInstanceUserIds
+     * @return array{
+     *     badgesEarned: int,
+     *     averageTimeToReview: ?int,
+     *     averageMergeTime: ?int,
+     *     totalLinesChanged: int,
+     * }
+     */
+    private function getOverallStats(array $vcsInstanceUserIds, CarbonInterface $from, CarbonInterface $to): array
+    {
+        $badgesEarned = DB::table('vcs_instance_users')
+            ->join('badges', 'vcs_instance_users.user_id', '=', 'badges.user_id')
+            ->whereIn('vcs_instance_users.id', $vcsInstanceUserIds)
+            ->whereDate('earned_at', '>=', $from)
+            ->whereDate('earned_at', '<=', $to)
+            ->count();
+
+        $averageTimeToReview = $this->getBaseTableStatsQuery($from, $to)
+            ->select(DB::raw('AVG(time_to_review) AS time_to_review'))
+            ->join('reviewers', 'pull_requests.id', '=', 'reviewers.pull_request_id')
+            ->whereIn('reviewers.vcs_instance_user_id', $vcsInstanceUserIds)
+            ->reorder()
+            ->value('time_to_review');
+
+        $averageMergeTime = DB::table('pull_requests')
+            ->select(DB::raw('AVG(TIMESTAMPDIFF(SECOND, pull_requests.created_at, pull_requests.merged_at)) as merge_time'))
+            ->whereIn('author_id', $vcsInstanceUserIds)
+            ->whereDate('updated_at', '>=', $from)
+            ->whereDate('updated_at', '<=', $to)
+            ->value('merge_time');
+
+        $totalLinesChanged = DB::table('pull_request_metrics')
+            ->join('pull_requests', 'pull_request_metrics.pull_request_id', '=', 'pull_requests.id')
+            ->whereIn('pull_requests.author_id', $vcsInstanceUserIds)
+            ->whereDate('updated_at', '>=', $from)
+            ->whereDate('updated_at', '<=', $to)
+            ->sum(DB::raw('(added_lines + deleted_lines)'));
+
+        return [
+            'badgesEarned' => $badgesEarned,
+            'averageTimeToReview' => $averageTimeToReview !== null ? (int)$averageTimeToReview : null,
+            'averageMergeTime' => $averageMergeTime !== null ? (int)$averageMergeTime : null,
+            'totalLinesChanged' => (int)$totalLinesChanged,
+        ];
     }
 
     /**
