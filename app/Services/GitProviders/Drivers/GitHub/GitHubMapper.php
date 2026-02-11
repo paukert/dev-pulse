@@ -55,7 +55,7 @@ use RuntimeException;
  *         }|array{
  *             __typename: 'ReviewRequestedEvent',
  *             createdAt: string,
- *             requestedReviewer: Actor|array{id: string, name: string},
+ *             requestedReviewer: null|Actor|array{id: string, name: string},
  *         }|array{
  *             __typename: 'PullRequestReview'|'IssueComment',
  *             id: string,
@@ -261,6 +261,11 @@ final readonly class GitHubMapper implements Mapper
             }
 
             if ($timelineItem['__typename'] === 'ReviewRequestedEvent') {
+                // skip when the review is requested from the "team"
+                if ($timelineItem['requestedReviewer'] === null) {
+                    continue;
+                }
+
                 $reviews[] = new PullRequestActivityDTO(
                     performedAt: Carbon::createFromFormat(DateTimeInterface::ATOM, $timelineItem['createdAt']),
                     user: new UserDTO(username: $timelineItem['requestedReviewer']['login'], vcsId: $timelineItem['requestedReviewer']['id']),
