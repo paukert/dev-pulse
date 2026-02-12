@@ -3,11 +3,12 @@
 declare(strict_types=1);
 
 use App\Models\Repository;
+use App\Services\Gamification\ChallengeProcessor;
 use App\Services\GitProviders\GitProviderFactory;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::call(static function (GitProviderFactory $factory): void {
+Schedule::call(static function (GitProviderFactory $factory, ChallengeProcessor $challengeProcessor): void {
     $condition = 'UNIX_TIMESTAMP(COALESCE(last_synced_at, statistics_from)) + sync_interval < ?';
     $query = Repository::whereRaw($condition, [time()]);
 
@@ -18,4 +19,6 @@ Schedule::call(static function (GitProviderFactory $factory): void {
         $provider->syncRepository($repository);
         Log::info("Repository $repository->name was successfully synced");
     }
+
+    $challengeProcessor->evaluateNewActivities();
 })->everyMinute()->name('repository-sync')->withoutOverlapping();

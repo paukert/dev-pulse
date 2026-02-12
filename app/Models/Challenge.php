@@ -22,6 +22,7 @@ use Illuminate\Validation\Rule;
  *
  * Relationships
  * @property Collection<int, ChallengeActivity> $activities
+ * @property Collection<int, Badge> $badges
  */
 class Challenge extends Model
 {
@@ -78,5 +79,13 @@ class Challenge extends Model
     public function activities(): HasMany
     {
         return $this->hasMany(ChallengeActivity::class);
+    }
+
+    /**
+     * @return HasMany<Badge, $this>
+     */
+    public function badges(): HasMany
+    {
+        return $this->hasMany(Badge::class);
     }
 }

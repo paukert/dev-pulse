@@ -8,6 +8,7 @@ use App\DTOs\PullRequest\PullRequestDTO;
 use App\DTOs\PullRequest\PullRequestsListDTO;
 use App\DTOs\RepositoriesListDTO;
 use App\Enums\VcsPlatform;
+use App\Events\PullRequestSynced;
 use App\Models\PullRequest;
 use App\Models\Repository;
 use App\Models\VcsInstance;
@@ -123,6 +124,7 @@ final readonly class GitProvider
                 $pullRequestDTO = $this->loadMissingActivities($pullRequestDTO);
 
                 PullRequest::upsertFromDTO($pullRequestDTO, $repository);
+                $this->dispatchPullRequestSyncedEvent($pullRequestDTO, $repository);
                 sleep(1);
             }
 
@@ -154,5 +156,24 @@ final readonly class GitProvider
         }
 
         return $pullRequest;
+    }
+
+    private function dispatchPullRequestSyncedEvent(PullRequestDTO $pullRequestDTO, Repository $repository): void
+    {
+        $userVcsIds = [$pullRequestDTO->author->vcsId];
+
+        if ($pullRequestDTO->mergedByUser !== null) {
+            $userVcsIds[] = $pullRequestDTO->mergedByUser->vcsId;
+        }
+
+        foreach ($pullRequestDTO->activities->approvals as $approval) {
+            $userVcsIds[] = $approval->user->vcsId;
+        }
+
+        foreach ($pullRequestDTO->activities->comments as $comment) {
+            $userVcsIds[] = $comment->author->vcsId;
+        }
+
+        PullRequestSynced::dispatch(array_unique($userVcsIds), $repository->vcs_instance_id);
     }
 }
