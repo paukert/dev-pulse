@@ -1,14 +1,50 @@
 import DataTableActions from '@/components/DataTableActions.vue';
+import Help from '@/components/Help.vue';
 import { type Challenge } from '@/types';
 import { ColumnDef } from '@tanstack/vue-table';
 import { truncate } from 'lodash-es';
+import { CircleCheckBig, CircleDashed, CircleX, Clock, LucideIcon } from 'lucide-vue-next';
 import { h } from 'vue';
 
 function formatDateTime(value: string) {
     return new Date(value).toLocaleString('en-GB');
 }
 
+const classesMap: Record<string, string> = {
+    active: 'text-blue-500',
+    completed: 'text-green-500',
+    expired: 'text-gray-500',
+    upcoming: 'text-gray-500',
+};
+
+const iconMap: Record<string, LucideIcon> = {
+    active: CircleDashed,
+    completed: CircleCheckBig,
+    expired: CircleX,
+    upcoming: Clock,
+};
+
+const titleMap: Record<string, string> = {
+    active: 'Currently ongoing',
+    completed: 'Successfully completed',
+    expired: 'Expired',
+    upcoming: 'Starting soon',
+};
+
 export const columns: ColumnDef<Challenge>[] = [
+    {
+        accessorKey: 'state',
+        meta: { cellClass: 'pr-1 h-14 w-[50px]' },
+        header: '',
+        cell: ({ row }) => {
+            const state: string = row.getValue('state');
+            return h(
+                Help,
+                { tooltip: titleMap[state] },
+                { icon: () => h(iconMap[state], { size: 16, class: `ml-auto block ${classesMap[state]}` }) },
+            );
+        },
+    },
     {
         accessorKey: 'id',
         header: () => h('div', { class: 'text-left' }, 'ID'),

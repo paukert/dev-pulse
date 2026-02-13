@@ -28,6 +28,7 @@ export interface Challenge {
     description: string;
     active_from: string;
     active_to: string;
+    state: 'active' | 'completed' | 'expired' | 'upcoming';
 }
 
 export interface ChallengeForm extends Omit<Challenge, 'id'> {

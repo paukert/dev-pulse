@@ -11,7 +11,9 @@ defineProps<{
     <TooltipProvider>
         <Tooltip :delay-duration="0">
             <TooltipTrigger as-child>
-                <CircleQuestionMark class="h-4 w-4 cursor-help" />
+                <slot name="icon">
+                    <CircleQuestionMark class="h-4 w-4 cursor-help" />
+                </slot>
             </TooltipTrigger>
             <TooltipContent>
                 {{ tooltip }}

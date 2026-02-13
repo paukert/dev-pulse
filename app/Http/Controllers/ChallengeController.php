@@ -8,8 +8,10 @@ use App\Enums\ChallengeActivityType;
 use App\Http\Requests\Challenges\ChallengeCreateRequest;
 use App\Models\Challenge;
 use App\Models\ChallengeActivity;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,8 +21,25 @@ class ChallengeController extends Controller
     {
         $perPage = $request->query->getInt('per_page', 20);
 
+        $select = <<<SQL
+            CASE
+                WHEN badges.id IS NOT NULL THEN 'completed'
+                WHEN challenges.active_to < NOW() THEN 'expired'
+                WHEN challenges.active_from > NOW() THEN 'upcoming'
+                ELSE 'active'
+            END AS state
+        SQL;
+
+        $challengeQuery = Challenge::query()
+            ->select(['challenges.*', DB::raw($select)])
+            ->leftJoin('badges', function (JoinClause $join) use ($request): void {
+                $join->on('challenges.id', '=', 'badges.challenge_id');
+                $join->where('badges.user_id', '=', $request->user()->id);
+            })
+            ->orderBy('challenges.id', 'DESC');
+
         return Inertia::render('challenges/Challenges', [
-            'challenges' => Challenge::paginate($perPage),
+            'challenges' => $challengeQuery->paginate($perPage),
         ]);
     }
 
