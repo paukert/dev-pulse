@@ -22,6 +22,8 @@ const props = defineProps<Props>();
 
 const page = usePage<SharedData>();
 const user = page.props.auth.user as User;
+
+const filteredColumns = columns.filter((column) => column.id !== 'actions' || user.isAdmin);
 </script>
 
 <template>
@@ -35,7 +37,7 @@ const user = page.props.auth.user as User;
                 </Link>
             </div>
             <div class="container mx-auto space-y-4 pb-10">
-                <DataTable :columns="columns" :paginated-data="props.challenges" />
+                <DataTable :columns="filteredColumns" :paginated-data="props.challenges" />
             </div>
         </div>
     </AppLayout>
