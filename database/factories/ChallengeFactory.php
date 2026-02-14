@@ -17,11 +17,13 @@ class ChallengeFactory extends Factory
 
     public function definition(): array
     {
+        $activeFrom = Carbon::now()->subDays(fake()->numberBetween(-5, 20));
+
         return [
             'name' => fake()->name(),
             'description' => fake()->text(),
-            'active_from' => Carbon::now()->subDays(fake()->numberBetween(10, 20)),
-            'active_to' => Carbon::now()->addDays(fake()->numberBetween(5, 10)),
+            'active_from' => $activeFrom,
+            'active_to' => (clone $activeFrom)->addDays(fake()->numberBetween(5, 10)),
         ];
     }
 }

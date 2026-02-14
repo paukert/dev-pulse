@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(50)->create();
+        User::factory(20)->create();
         VcsInstance::factory(4)
             ->create()
             ->each(static function (VcsInstance $vcsInstance): void {
@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
             });
         Repository::factory(20)->create();
 
-        $pullRequests = PullRequest::factory(100)
+        $pullRequests = PullRequest::factory(500)
             ->hasMetrics()
             ->create();
 
@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
             $reviewers = VcsInstanceUser::inRandomOrder()
                 ->where('vcs_instance_id', '=', $pullRequest->repository->vcs_instance_id)
                 ->where('id', '!=', $pullRequest->author_id)
-                ->limit(rand(0, 2))
+                ->limit(rand(1, 4))
                 ->get();
 
             /** @var VcsInstanceUser $reviewer */
@@ -110,13 +110,17 @@ class DatabaseSeeder extends Seeder
 
         /** @var Challenge $challenge */
         foreach ($challenges as $challenge) {
+            if ($challenge->active_from->isAfter(now())) {
+                continue;
+            }
+
             $attrsCallback = fn (): array => [
                 'earned_at' => fake()->dateTimeBetween($challenge->active_from, now()),
                 'challenge_id' => $challenge->id,
                 'user_id' => User::inRandomOrder()->first()->id,
             ];
 
-            Badge::factory(rand(1, 3), $attrsCallback)->create();
+            Badge::factory(rand(5, 10), $attrsCallback)->create();
         }
     }
 }
