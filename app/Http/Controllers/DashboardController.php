@@ -87,7 +87,7 @@ class DashboardController extends Controller
             ->whereIn('vcs_instance_users.id', $vcsInstanceUserIds)
             ->whereDate('earned_at', '>=', $from)
             ->whereDate('earned_at', '<=', $to)
-            ->count();
+            ->count(DB::raw('DISTINCT badges.id'));
 
         $averageTimeToReview = $this->getBaseTableStatsQuery($from, $to)
             ->select(DB::raw('AVG(time_to_review) AS time_to_review'))
