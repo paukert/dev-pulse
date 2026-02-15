@@ -16,4 +16,16 @@ enum VcsPlatform: string
             self::GITLAB => __('GitLab'),
         };
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getLabels(): array
+    {
+        $platforms = [];
+        foreach (self::cases() as $platform) {
+            $platforms[$platform->value] = $platform->getLabel();
+        }
+        return $platforms;
+    }
 }

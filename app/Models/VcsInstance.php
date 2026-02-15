@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\Rule;
 
 /**
  * Attributes
@@ -30,11 +31,33 @@ class VcsInstance extends Model
 
     public $timestamps = false;
 
+    protected $fillable = [
+        'name',
+        'api_url',
+        'token',
+        'installation_id',
+        'platform',
+    ];
+
     protected function casts(): array
     {
         return [
             'platform' => VcsPlatform::class,
             'token' => 'encrypted',
+        ];
+    }
+
+    /**
+     * @return array<string, array<array-key, mixed>>
+     */
+    public static function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'api_url' => ['required', 'url', 'max:255'],
+            'token' => ['required_if:platform,gitlab', 'nullable', 'string'],
+            'installation_id' => ['required_if:platform,github', 'nullable', 'string', 'max:255'],
+            'platform' => ['required', Rule::enum(VcsPlatform::class)],
         ];
     }
 
