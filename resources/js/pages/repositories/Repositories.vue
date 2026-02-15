@@ -26,9 +26,12 @@ const props = defineProps<Props>();
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl px-4 py-6">
-            <div class="flex justify-end">
+            <div class="flex justify-end gap-2">
                 <Link :href="route('repositories.create')" as="button">
                     <Button><Plus /> Add repository</Button>
+                </Link>
+                <Link :href="route('vcs-instances.create')" as="button">
+                    <Button><Plus /> Add VCS instance</Button>
                 </Link>
             </div>
             <div class="container mx-auto space-y-4 pb-10">
