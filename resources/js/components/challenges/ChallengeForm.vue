@@ -103,7 +103,7 @@ const removeActivity = (index: number) => {
         <div class="grid gap-2">
             <div class="flex items-center justify-between">
                 <Label>Activities</Label>
-                <Button :disabled="!canEditChallengeDefinition" variant="secondary" @click="addActivity"><Plus /> Add activity</Button>
+                <Button type="button" :disabled="!canEditChallengeDefinition" variant="secondary" @click="addActivity"><Plus /> Add activity</Button>
             </div>
 
             <div class="space-y-4">
