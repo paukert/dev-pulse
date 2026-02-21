@@ -73,7 +73,7 @@ const table = useVueTable({
             <Table>
                 <TableHeader>
                     <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-                        <TableHead v-for="header in headerGroup.headers" :key="header.id">
+                        <TableHead v-for="header in headerGroup.headers" :key="header.id" class="whitespace-nowrap">
                             <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header" :props="header.getContext()" />
                         </TableHead>
                     </TableRow>
