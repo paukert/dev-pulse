@@ -94,7 +94,6 @@ export const columns: ColumnDef<Challenge>[] = [
                     deleteConfirmationTitle: `Do you really want to delete challenge ${challenge.name}?`,
                     deleteConfirmationMessage: `This action cannot be undone. This will permanently delete challenge ${challenge.name} and all associated data.`,
                     deleteUrl: route('challenges.destroy', { challenge: challenge.id }),
-                    editUrl: route('challenges.edit', { challenge: challenge.id }),
                 }),
             );
         },

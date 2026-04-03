@@ -19,7 +19,7 @@ const props = defineProps<{
     deleteConfirmationTitle: string;
     deleteConfirmationMessage: string;
     deleteUrl: string;
-    editUrl: string;
+    editUrl?: string;
 }>();
 
 const isDropdownOpen = ref(false);
@@ -39,7 +39,9 @@ const closeDropdown = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem @select="() => router.get(props.editUrl)"><SquarePen /> Edit</DropdownMenuItem>
+            <template v-if="props.editUrl">
+                <DropdownMenuItem @select="() => router.get(props.editUrl!)"><SquarePen /> Edit</DropdownMenuItem>
+            </template>
 
             <Dialog>
                 <DialogTrigger as-child>
