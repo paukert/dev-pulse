@@ -61,7 +61,7 @@ use RuntimeException;
  *             id: string,
  *             body: string,
  *             createdAt: string,
- *             author: Actor,
+ *             author: ?Actor,
  *         },
  *     >
  * }
@@ -276,6 +276,11 @@ final readonly class GitHubMapper implements Mapper
             if (in_array($timelineItem['__typename'], ['PullRequestReview', 'IssueComment'])) {
                 // when user just approves PR, there is no body in the PullRequestReview item
                 if ($timelineItem['body'] === '') {
+                    continue;
+                }
+
+                // when the user account is deleted, author attribute is set to null
+                if ($timelineItem['author'] === null) {
                     continue;
                 }
 
