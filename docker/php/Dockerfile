@@ -1,6 +1,6 @@
 # docker build -t php-dev-pulse -f docker/php/Dockerfile .
 
-FROM php:8.5.2-apache AS base
+FROM php:8.5.5-apache AS base
 
 RUN apt-get update \
     && apt-get install -y zlib1g-dev build-essential gnupg ca-certificates libzip-dev libicu-dev g++ git zip curl libgd-dev libpng-dev libjpeg-dev libfreetype6-dev libpq-dev \
@@ -18,7 +18,7 @@ RUN apt-get update \
 #COPY ./docker/php.ini /usr/local/etc/php/php.ini
 
 # Composer
-COPY --from=composer:2.9.2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.9.7 /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Set document root
