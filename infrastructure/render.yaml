@@ -1,0 +1,260 @@
+# Exported from Render on 2026-04-19T19:44:29Z
+version: "1"
+projects:
+- name: DevPulse
+  environments:
+  - name: Production
+    services:
+    - type: pserv
+      name: mariadb
+      runtime: image
+      image:
+        url: docker.io/library/mariadb:11.4.9
+      plan: starter
+      envVars:
+      - key: MARIADB_ROOT_PASSWORD
+        sync: false
+      - key: MARIADB_DATABASE
+        sync: false
+      region: frankfurt
+      autoDeployTrigger: commit
+    - type: web
+      name: devpulse
+      runtime: docker
+      repo: https://github.com/paukert/dev-pulse
+      branch: add-vcs-instances
+      plan: starter
+      envVars:
+      - key: GITHUB_APP_PRIVATE_KEY
+        sync: false
+      - key: GITHUB_APP_CLIENT_ID
+        sync: false
+      - key: VITE_APP_NAME
+        sync: false
+      - key: MAIL_FROM_NAME
+        sync: false
+      - key: DEBUGBAR_OPEN_STORAGE
+        sync: false
+      - key: DEBUGBAR_ENABLED
+        sync: false
+      - key: AWS_USE_PATH_STYLE_ENDPOINT
+        sync: false
+      - key: AWS_BUCKET
+        sync: false
+      - key: AWS_DEFAULT_REGION
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: MAIL_FROM_ADDRESS
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PORT
+        sync: false
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_SCHEME
+        sync: false
+      - key: MAIL_MAILER
+        sync: false
+      - key: REDIS_PORT
+        sync: false
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_CLIENT
+        sync: false
+      - key: MEMCACHED_HOST
+        sync: false
+      - key: CACHE_STORE
+        sync: false
+      - key: QUEUE_CONNECTION
+        sync: false
+      - key: FILESYSTEM_DISK
+        sync: false
+      - key: BROADCAST_CONNECTION
+        sync: false
+      - key: SESSION_DOMAIN
+        sync: false
+      - key: SESSION_PATH
+        sync: false
+      - key: SESSION_ENCRYPT
+        sync: false
+      - key: SESSION_LIFETIME
+        sync: false
+      - key: SESSION_DRIVER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_HOST
+        fromService:
+          name: mariadb
+          type: pserv
+          property: host
+      - key: DB_CONNECTION
+        sync: false
+      - key: LOG_LEVEL
+        sync: false
+      - key: LOG_DEPRECATIONS_CHANNEL
+        sync: false
+      - key: LOG_STACK
+        sync: false
+      - key: LOG_CHANNEL
+        sync: false
+      - key: BCRYPT_ROUNDS
+        sync: false
+      - key: PHP_CLI_SERVER_WORKERS
+        sync: false
+      - key: APP_MAINTENANCE_DRIVER
+        sync: false
+      - key: APP_FAKER_LOCALE
+        sync: false
+      - key: APP_FALLBACK_LOCALE
+        sync: false
+      - key: APP_LOCALE
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: APP_DEBUG
+        sync: false
+      - key: APP_KEY
+        sync: false
+      - key: APP_ENV
+        sync: false
+      - key: APP_NAME
+        sync: false
+      region: frankfurt
+      dockerContext: .
+      dockerfilePath: ./docker/php/Dockerfile
+      domains:
+      - devpulse.paukertlukas.cz
+      autoDeployTrigger: commit
+      renderSubdomainPolicy: disabled
+    - type: cron
+      name: laravel-scheduler
+      runtime: docker
+      repo: https://github.com/paukert/dev-pulse
+      branch: add-vcs-instances
+      plan: starter
+      envVars:
+      - key: GITHUB_APP_PRIVATE_KEY
+        sync: false
+      - key: GITHUB_APP_CLIENT_ID
+        sync: false
+      - key: MAIL_HOST
+        sync: false
+      - key: DEBUGBAR_OPEN_STORAGE
+        sync: false
+      - key: DEBUGBAR_ENABLED
+        sync: false
+      - key: VITE_APP_NAME
+        sync: false
+      - key: AWS_USE_PATH_STYLE_ENDPOINT
+        sync: false
+      - key: AWS_DEFAULT_REGION
+        sync: false
+      - key: MAIL_FROM_NAME
+        sync: false
+      - key: MAIL_FROM_ADDRESS
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PORT
+        sync: false
+      - key: MAIL_SCHEME
+        sync: false
+      - key: MAIL_MAILER
+        sync: false
+      - key: REDIS_PORT
+        sync: false
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_CLIENT
+        sync: false
+      - key: MEMCACHED_HOST
+        sync: false
+      - key: CACHE_STORE
+        sync: false
+      - key: QUEUE_CONNECTION
+        sync: false
+      - key: FILESYSTEM_DISK
+        sync: false
+      - key: BROADCAST_CONNECTION
+        sync: false
+      - key: SESSION_DOMAIN
+        sync: false
+      - key: SESSION_PATH
+        sync: false
+      - key: SESSION_ENCRYPT
+        sync: false
+      - key: SESSION_LIFETIME
+        sync: false
+      - key: SESSION_DRIVER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_HOST
+        fromService:
+          name: mariadb
+          type: pserv
+          property: host
+      - key: DB_CONNECTION
+        sync: false
+      - key: LOG_LEVEL
+        sync: false
+      - key: LOG_DEPRECATIONS_CHANNEL
+        sync: false
+      - key: LOG_STACK
+        sync: false
+      - key: LOG_CHANNEL
+        sync: false
+      - key: BCRYPT_ROUNDS
+        sync: false
+      - key: PHP_CLI_SERVER_WORKERS
+        sync: false
+      - key: APP_MAINTENANCE_DRIVER
+        sync: false
+      - key: APP_FAKER_LOCALE
+        sync: false
+      - key: APP_FALLBACK_LOCALE
+        sync: false
+      - key: APP_LOCALE
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: APP_DEBUG
+        sync: false
+      - key: APP_KEY
+        sync: false
+      - key: APP_ENV
+        sync: false
+      - key: APP_NAME
+        sync: false
+      region: frankfurt
+      schedule: '* * * * *'
+      dockerCommand: /bin/bash -c composer dump-autoload --optimize --no-dev --strict-ambiguous
+        --strict-psr && php artisan schedule:run
+      dockerContext: .
+      dockerfilePath: ./docker/php/Dockerfile
+      autoDeployTrigger: commit
