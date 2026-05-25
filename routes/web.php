@@ -7,6 +7,7 @@ use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RepositoryController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VcsInstanceController;
 use App\Http\Controllers\VcsInstanceUserController;
 use Illuminate\Support\Facades\Route;
 
@@ -52,6 +53,11 @@ Route::middleware(['auth', 'verified', $hasAdminRoleMiddleware])->group(static f
         'edit',
         'update',
         'destroy',
+    ]);
+
+    Route::resource('vcs-instances', VcsInstanceController::class)->only([
+        'create',
+        'store',
     ]);
 
     Route::resource('challenges', ChallengeController::class)->only([

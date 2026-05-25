@@ -80,6 +80,14 @@ export interface RepositoryForm {
     statistics_from?: string;
 }
 
+export interface VcsInstance {
+    name: string;
+    api_url: string;
+    token: string | null;
+    installation_id: string | null;
+    platform: 'github' | 'gitlab';
+}
+
 export interface VcsInstanceUser {
     username: string;
 }
