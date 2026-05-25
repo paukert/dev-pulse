@@ -42,7 +42,7 @@ services:
       MARIADB_DATABASE: dev_pulse
 
   adminer:
-    image: adminer:5.4.1
+    image: adminer:5.4.2
     restart: always
     ports:
       - "8080:8080"
