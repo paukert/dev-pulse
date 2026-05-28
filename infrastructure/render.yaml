@@ -1,4 +1,4 @@
-# Exported from Render on 2026-04-19T19:44:29Z
+# Exported from Render on 2026-05-28T12:09:32Z
 version: "1"
 projects:
 - name: DevPulse
@@ -22,7 +22,6 @@ projects:
       name: devpulse
       runtime: docker
       repo: https://github.com/paukert/dev-pulse
-      branch: add-vcs-instances
       plan: starter
       envVars:
       - key: GITHUB_APP_PRIVATE_KEY
@@ -145,7 +144,6 @@ projects:
       name: laravel-scheduler
       runtime: docker
       repo: https://github.com/paukert/dev-pulse
-      branch: add-vcs-instances
       plan: starter
       envVars:
       - key: GITHUB_APP_PRIVATE_KEY
