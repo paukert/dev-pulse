@@ -12,13 +12,24 @@ Schedule::call(static function (GitProviderFactory $factory, ChallengeProcessor 
     $condition = 'UNIX_TIMESTAMP(COALESCE(last_synced_at, statistics_from)) + sync_interval < ?';
     $query = Repository::whereRaw($condition, [time()]);
 
+    $failures = [];
+
     /** @var Repository $repository */
     foreach ($query->lazy(50) as $repository) {
-        $provider = $factory->create($repository->vcsInstance);
-        Log::info("Syncing repository $repository->name");
-        $provider->syncRepository($repository);
-        Log::info("Repository $repository->name was successfully synced");
+        try {
+            $provider = $factory->create($repository->vcsInstance);
+            Log::info("Syncing repository $repository->name");
+            $provider->syncRepository($repository);
+            Log::info("Repository $repository->name was successfully synced");
+        } catch (Throwable $e) {
+            Log::error("Failed to sync repository $repository->name: {$e->getMessage()}");
+            $failures[] = $repository->name;
+        }
     }
 
     $challengeProcessor->evaluateNewActivities();
+
+    if ($failures !== []) {
+        throw new RuntimeException('Failed to sync repositories: ' . implode(', ', $failures));
+    }
 })->everyMinute()->name('repository-sync')->withoutOverlapping();
