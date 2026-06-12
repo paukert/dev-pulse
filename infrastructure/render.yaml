@@ -1,4 +1,4 @@
-# Exported from Render on 2026-05-28T12:09:32Z
+# Exported from Render on 2026-06-12T15:13:06Z
 version: "1"
 projects:
 - name: DevPulse
@@ -17,6 +17,10 @@ projects:
       - key: MARIADB_DATABASE
         sync: false
       region: frankfurt
+      disk:
+        name: disk
+        mountPath: /var/lib/mysql
+        sizeGB: 1
       autoDeployTrigger: commit
     - type: web
       name: devpulse
