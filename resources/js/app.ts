@@ -32,7 +32,7 @@ createInertiaApp({
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
-            .use(HighchartsVue)
+            .use(HighchartsVue.default)
             .mount(el);
     },
     progress: {
