@@ -20,7 +20,7 @@ class ChallengeCreateRequest extends FormRequest
     }
 
     /**
-     * @return array<string, array<array-key, mixed>>
+     * @return array<string, string>
      */
     public function messages(): array
     {

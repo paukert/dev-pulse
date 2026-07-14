@@ -63,7 +63,7 @@ class Challenge extends Model
     }
 
     /**
-     * @return array<string, array<array-key, mixed>>
+     * @return array<string, string>
      */
     public static function messages(): array
     {
