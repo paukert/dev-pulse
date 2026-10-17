@@ -23,7 +23,7 @@ services:
       ofelia.job-exec.laravel-cron.command: "php artisan schedule:run"
 
   ofelia:
-    image: mcuadros/ofelia:0.3.20
+    image: mcuadros/ofelia:0.3.22
     depends_on:
       - php
     command: daemon --docker
@@ -31,7 +31,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
   db:
-    image: mariadb:11.4.9
+    image: mariadb:11.4.13
     restart: always
     ports:
       - "3306:3306"
@@ -42,7 +42,7 @@ services:
       MARIADB_DATABASE: dev_pulse
 
   adminer:
-    image: adminer:5.4.2
+    image: adminer:6.1.2
     restart: always
     ports:
       - "8080:8080"
