@@ -14,7 +14,10 @@ const baseOptions = {
         type: 'line',
     },
     legend: { enabled: false },
-    pane: { size: '65 %' },
+    pane: {
+        size: '65 %',
+        background: { backgroundColor: 'transparent' }
+    },
     plotOptions: {
         series: {
             marker: { enabled: false },
