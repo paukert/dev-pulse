@@ -16,7 +16,7 @@ const baseOptions = {
     legend: { enabled: false },
     pane: {
         size: '65 %',
-        background: { backgroundColor: 'transparent' }
+        background: { backgroundColor: 'transparent' },
     },
     plotOptions: {
         series: {
