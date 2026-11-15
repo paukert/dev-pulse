@@ -36,7 +36,7 @@ class ChallengeController extends Controller
                 $join->on('challenges.id', '=', 'badges.challenge_id');
                 $join->where('badges.user_id', '=', $request->user()->id);
             })
-            ->orderBy('challenges.id', 'DESC');
+            ->orderBy('challenges.id', 'desc');
 
         return Inertia::render('challenges/Challenges', [
             'challenges' => $challengeQuery->paginate($perPage),
