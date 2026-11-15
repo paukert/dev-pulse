@@ -228,7 +228,7 @@ class DashboardController extends Controller
             ->leftJoinSub($timeToReviewQuery, 'time_to_review', 'pull_requests.id', '=', 'time_to_review.pull_request_id')
             ->whereDate('pull_requests.updated_at', '>=', $from)
             ->whereDate('pull_requests.updated_at', '<=', $to)
-            ->orderBy('pull_requests.updated_at', 'DESC');
+            ->orderBy('pull_requests.updated_at', 'desc');
     }
 
     /**
